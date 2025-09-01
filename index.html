@@ -2,35 +2,31 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Demo SPA на GitHub Pages</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <nav class="menu">
-    <button data-file="news.html">Новости</button>
-    <button data-file="articles.html">Статьи</button>
-    <button data-file="reviews.html">Отзывы</button>
-  </nav>
+  <header>
+    <nav class="menu">
+      <button data-file="news.html" class="nav-btn active">Новости</button>
+      <button data-file="articles.html" class="nav-btn">Статьи</button>
+      <button data-file="reviews.html" class="nav-btn">Отзывы</button>
+    </nav>
+  </header>
 
   <main id="content" class="content-box">
-    <h2>Добро пожаловать</h2>
-    <p>Нажмите кнопку, чтобы загрузить контент.</p>
+    <div class="welcome-message">
+      <h2>Добро пожаловать</h2>
+      <p>Выберите раздел в меню, чтобы загрузить контент.</p>
+    </div>
   </main>
 
-  <script>
-    const content = document.getElementById("content");
-    document.querySelectorAll("button[data-file]").forEach(button => {
-      button.addEventListener("click", async () => {
-        const file = button.dataset.file;
-        try {
-          const response = await fetch(file);
-          const html = await response.text();
-          content.innerHTML = html;
-        } catch (e) {
-          content.innerHTML = "<p>Ошибка загрузки</p>";
-        }
-      });
-    });
-  </script>
+  <div id="loading" class="loading" style="display: none;">
+    <div class="spinner"></div>
+    <p>Загрузка...</p>
+  </div>
+
+  <script src="js/app.js"></script>
 </body>
 </html>
