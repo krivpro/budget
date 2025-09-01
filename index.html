@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo SPA на GitHub Pages</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="menu">
+    <button data-file="news.html">Новости</button>
+    <button data-file="articles.html">Статьи</button>
+    <button data-file="reviews.html">Отзывы</button>
+  </nav>
+
+  <main id="content" class="content-box">
+    <h2>Добро пожаловать</h2>
+    <p>Нажмите кнопку, чтобы загрузить контент.</p>
+  </main>
+
+  <script>
+    const content = document.getElementById("content");
+    document.querySelectorAll("button[data-file]").forEach(button => {
+      button.addEventListener("click", async () => {
+        const file = button.dataset.file;
+        try {
+          const response = await fetch(file);
+          const html = await response.text();
+          content.innerHTML = html;
+        } catch (e) {
+          content.innerHTML = "<p>Ошибка загрузки</p>";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
