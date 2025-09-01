@@ -3,29 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Demo SPA на GitHub Pages</title>
+  <title>Мой проект</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header>
     <nav class="menu">
-      <button data-file="news.html" class="nav-btn active">Новости</button>
-      <button data-file="articles.html" class="nav-btn">Статьи</button>
-      <button data-file="reviews.html" class="nav-btn">Отзывы</button>
+      <button data-page="main" class="nav-btn active">Главная</button>
+      <button data-page="additional" class="nav-btn">Дополнительная</button>
     </nav>
   </header>
 
-  <main id="content" class="content-box">
-    <div class="welcome-message">
-      <h2>Добро пожаловать</h2>
-      <p>Выберите раздел в меню, чтобы загрузить контент.</p>
+  <main id="content">
+    <!-- Контент будет загружаться сюда -->
+    <div class="page-content">
+      <h1>Добро пожаловать на главную страницу</h1>
+      <p>Это стартовая страница моего проекта.</p>
     </div>
   </main>
-
-  <div id="loading" class="loading" style="display: none;">
-    <div class="spinner"></div>
-    <p>Загрузка...</p>
-  </div>
 
   <script src="js/app.js"></script>
 </body>

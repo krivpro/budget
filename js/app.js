@@ -1,100 +1,73 @@
-class SPA {
+class SimpleSPA {
   constructor() {
-    this.content = document.getElementById("content");
-    this.loading = document.getElementById("loading");
-    this.buttons = document.querySelectorAll(".nav-btn");
+    this.content = document.getElementById('content');
+    this.buttons = document.querySelectorAll('.nav-btn');
+    this.currentPage = 'main';
     this.init();
   }
 
   init() {
     this.setupEventListeners();
-    this.setupNavigationState();
   }
 
   setupEventListeners() {
     this.buttons.forEach(button => {
-      button.addEventListener("click", (e) => {
-        this.handleNavigation(e.target);
+      button.addEventListener('click', () => {
+        const page = button.dataset.page;
+        if (page !== this.currentPage) {
+          this.loadPage(page);
+        }
       });
     });
-
-    // Обработка кнопок браузера вперед/назад
-    window.addEventListener('popstate', (e) => {
-      if (e.state && e.state.file) {
-        this.loadContent(e.state.file, false);
-        this.updateActiveButton(e.state.file);
-      }
-    });
   }
 
-  setupNavigationState() {
-    // Восстановление состояния при загрузке страницы
-    const path = window.location.pathname;
-    if (path !== '/') {
-      const file = path.split('/').pop();
-      this.loadContent(file, false);
-      this.updateActiveButton(file);
-    }
-  }
-
-  async handleNavigation(button) {
-    const file = button.dataset.file;
-    this.updateActiveButton(file);
-    this.loadContent(file, true);
-  }
-
-  updateActiveButton(file) {
-    this.buttons.forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.file === file);
-    });
-  }
-
-  async loadContent(file, pushState = true) {
-    this.showLoading();
-    
+  async loadPage(pageName) {
     try {
-      const response = await fetch(file);
+      // Обновляем активную кнопку
+      this.updateActiveButton(pageName);
+      
+      // Если главная страница - показываем встроенный контент
+      if (pageName === 'main') {
+        this.content.innerHTML = `
+          <div class="page-content">
+            <h1>Добро пожаловать на главную страницу</h1>
+            <p>Это стартовая страница моего проекта.</p>
+          </div>
+        `;
+        this.currentPage = 'main';
+        return;
+      }
+
+      // Загружаем дополнительную страницу
+      const response = await fetch(`${pageName}.html`);
       
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Страница не найдена');
       }
       
       const html = await response.text();
-      
-      setTimeout(() => {
-        this.content.innerHTML = html;
-        this.hideLoading();
-        
-        if (pushState) {
-          window.history.pushState({ file }, '', `/${file}`);
-        }
-        
-        // Прокрутка к верху контента
-        this.content.scrollIntoView({ behavior: 'smooth' });
-      }, 300); // Небольшая задержка для плавности анимации
+      this.content.innerHTML = html;
+      this.currentPage = pageName;
       
     } catch (error) {
       console.error('Ошибка загрузки:', error);
       this.content.innerHTML = `
-        <div class="error-message">
-          <h2>Ошибка загрузки</h2>
-          <p>Не удалось загрузить содержимое. Пожалуйста, попробуйте позже.</p>
+        <div class="page-content">
+          <h1>Ошибка</h1>
+          <p>Не удалось загрузить страницу. Попробуйте позже.</p>
         </div>
       `;
-      this.hideLoading();
     }
   }
 
-  showLoading() {
-    this.loading.style.display = 'block';
-  }
-
-  hideLoading() {
-    this.loading.style.display = 'none';
+  updateActiveButton(pageName) {
+    this.buttons.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.page === pageName);
+    });
   }
 }
 
-// Инициализация приложения когда DOM загружен
+// Запускаем приложение когда страница загрузится
 document.addEventListener('DOMContentLoaded', () => {
-  new SPA();
+  new SimpleSPA();
 });
