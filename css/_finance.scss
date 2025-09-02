@@ -1,0 +1,23 @@
+.finance {
+    position: relative;
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    border-radius: 12px;
+    background: $dark;
+    box-shadow: $shadow;
+
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        border-radius: 0 0 12px 12px;
+        background: $stroke;
+        pointer-events: none;
+    }
+}
