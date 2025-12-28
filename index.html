@@ -3,40 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <title>Document</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header class="header">
+    <header class="header container">
         <div class="header__logo">budget</div>
-        <div class="header__income income">
+        <div class="header__item header__income income">
             <div class="header__title">Доходы</div>
-            <div class="income__sum">0,00 Р</div>
+            <div class="income__sum header__sum sum">0,00 Р</div>
         </div>
-        <div class="header__expenses expenses">
+        <div class="header__item header__expenses expenses">
             <div class="header__title">Расходы</div>
-            <div class="expenses__sum">0,00 Р</div>
+            <div class="expenses__sum header__sum sum">0,00 Р</div>
         </div>
     </header>
-    <div class="add-operation">
-        <h2 class="add-operation__title">Добавить операцию</h2>
-        <input type="text" class="add-operation__input" placeholder="Сумма">
-        <div class="add-operation__hint">Введите сумму в рублях</div>
-        <input type="text" class="add-operation__input" placeholder="Описание">
-        <div class="add-operation__hint">Например: “Зарплата”, “Продукты”</div>
-        <a href="#" class="add-operation__btn">Доход</a>
-        <a href="#" class="add-operation__btn">Расход</a>
-        <div class="add-operation__btn_main">+ Добавить операцию</div>
-    </div>
-    <div class="transaction-history">
-        <h2 class="transaction-history__title">История операций</h2>
-        <div class="transaction-history__categories categories">
-            <div class="categories__item">Все</div>
-            <div class="categories__item">Доходы</div>
-            <div class="categories__item">Расходы</div>
-            <div class="transaction-history__no-history">Операций пока нет</div>
+    <main class="main container">
+        <div class="add-operation">
+            <h2 class="add-operation__title">Добавить операцию</h2>
+            <input type="text" class="add-operation__input" placeholder="Сумма">
+            <div class="add-operation__hint">Введите сумму в рублях</div>
+            <input type="text" class="add-operation__input" placeholder="Описание">
+            <div class="add-operation__hint">Например: “Зарплата”, “Продукты”</div>
+            <div class="add-operation__btn-block">
+                <a href="#" class="add-operation__btn active">Доход</a>
+                <a href="#" class="add-operation__btn">Расход</a>
+                <a href="#" class="add-operation__btn add-operation__btn_main">+ Добавить операцию<a> 
+            </div>
         </div>
-    </div>
-    <footer class="footer">
+        <div class="transaction-history">
+
+            <div class="transaction-history__control-panel">
+                <h2 class="transaction-history__title">История операций</h2>
+                <div class="transaction-history__categories categories">
+                    <div class="categories__item active">Все</div>
+                    <div class="categories__item">Доходы</div>
+                    <div class="categories__item">Расходы</div>
+                    <div class="transaction-history__no-history">Операций пока нет</div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+    
+    <footer class="footer container">
         <div class="footer__btn">Очистить данные</div>
         <div class="footer__sign">Оптимизировано для мобильных</div>
     </footer>
