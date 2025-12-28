@@ -69,31 +69,54 @@ input:focus {
     line-height: 100%;
 }
 
-.add-operation {
+.add {
     background-color: #2A2A2A;
     border-radius: 20px;
     padding: 32px 16px;
     margin-bottom: 32px;
 }
 
-.add-operation__title {
+.add__title {
     font-weight: 700;
     font-size: 20px;
     line-height: 100%;
     margin-bottom: 24px;
 }
 
-.add-operation__input {
+.add__input {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 100%;
     background: #272727;
-    border-radius: 16px;
+    border-radius: 8px;
     border: none;
     padding: 20px;  
     width: 100%;
     box-sizing: border-box; 
     margin-bottom: 8px;
+    color: #FFFFFF;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: none !important;
 }
 
-.add-operation__input::placeholder {
+input[type="date"]::-webkit-calendar-picker-indicator {
+  display: none !important;
+}
+
+input[type="date"]::-moz-calendar-picker-indicator {
+  display: none !important;
+}
+
+input[type="date"]::-ms-clear,
+input[type="date"]::-ms-reveal {
+  display: none;
+}
+
+.add__input::placeholder {
     font-family: 'Inter';
     font-style: normal;
     font-weight: 400;
@@ -102,7 +125,7 @@ input:focus {
     color: #3B3B3B;
 }
 
-.add-operation__hint {
+.add__hint {
     margin-left: 8px;
     font-weight: 400;
     font-size: 14px;
@@ -110,7 +133,7 @@ input:focus {
     margin-bottom: 32px;
 }
 
-.add-operation__btn-block {
+.add__btn-block {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(2, auto);
@@ -119,42 +142,35 @@ input:focus {
     justify-items: center;
 }
 
-.add-operation__btn {
-    background: #272727;
+.add__btn {
     border-radius: 8px;
-    grid-column: span 1;
-    padding: 32px;
-    background: #272727;
-    border-radius: 20px;
     box-sizing: border-box;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.add-operation__btn_main {
     grid-column: span 2;
     background: #FF7653;
     padding: 16px;
-
 }
 
-.transaction-history {
+.list {
     background-color: #2A2A2A;
     border-radius: 20px;
     padding: 32px 16px;
     position: relative;
     min-height: 320px;
-    margin-bottom: 120px;
+    margin-bottom: 32px;
 }
 
-.transaction-history__control-panel {
+.control-panel {
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
 }
 
-.transaction-history__categories {
+.control-panel__categories {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -169,15 +185,94 @@ input:focus {
     border-radius: 8px;
 }
 
-.transaction-history__no-history {
+.list__no-history {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
 }
 
+.history {
+    margin-bottom: 120px;
+}
+
 .active {
     background-color: #FF7653;
+}
+
+/* Прячем нативный checkbox */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+/* Стилизуем кастомный checkbox */
+.custom-checkbox {
+  display: grid;
+  grid-template-columns: 20px repeat(3, 1fr);
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-icon {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #272727;
+  border-radius: 4px;
+  background: white;
+  transition: all 0.3s ease;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Состояние: чекбокс отмечен */
+.visually-hidden:checked + .checkbox-icon {
+  background: #FF7653;
+  border-color: #FF7653;
+}
+
+/* Галочка (псевдоэлемент) */
+.visually-hidden:checked + .checkbox-icon::after {
+  content: '';
+  width: 6px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* Hover эффект */
+/* .custom-checkbox:hover .checkbox-icon {
+  border-color: #FF7653;
+} */
+
+/* Focus состояние для доступности */
+/* .visually-hidden:focus + .checkbox-icon {
+  outline: 2px solid #FF7653;
+  outline-offset: 2px;
+} */
+
+/* Disabled состояние */
+/* .visually-hidden:disabled + .checkbox-icon {
+  background: #f5f5f5;
+  border-color: #ddd;
+  cursor: not-allowed;
+} */
+
+.operation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .footer {
@@ -199,4 +294,25 @@ input:focus {
     padding: 16px 24px;
     background: #FF7653;
     border-radius: 8px;
+}
+
+@media (max-width: 560px) {
+
+    .header__sum {
+        font-size: 20px;
+    }
+
+    .control-panel {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .history {
+        margin-bottom: 150px;
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 16px;
+    }
 }
