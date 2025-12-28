@@ -6,60 +6,69 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <title>Budget App</title>
+    <title>Budget App - Планирование бюджета</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header class="header container">
         <div class="header__logo">budget</div>
+        
         <div class="header__item header__income income">
             <div class="header__title">Доходы</div>
             <div class="income__sum header__sum sum">0,00 Р</div>
         </div>
+        
         <div class="header__item header__expenses expenses">
             <div class="header__title">Расходы</div>
             <div class="expenses__sum header__sum sum">0,00 Р</div>
         </div>
+        
+        <div class="header__item header__balance balance">
+            <div class="header__title">Остаток</div>
+            <div class="balance__sum header__sum sum">0,00 Р</div>
+        </div>
     </header>
+    
     <main class="main container">
         <div class="add">
             <div class="control-panel">
-                <h2 class="control-panel__title">Добавить</h2>
+                <h2 class="control-panel__title">Добавить операцию</h2>
                 <div class="control-panel__categories categories">
                     <div class="categories__item active" data-type="income">Доходы</div>
                     <div class="categories__item" data-type="expense">Расходы</div>
                     <div class="categories__item" data-type="plan">Планы</div>
                 </div>
             </div>
-            <input type="text" class="add__input" placeholder="Сумма">
+            <input type="text" class="add__input" id="amountInput" placeholder="Сумма" inputmode="decimal">
             <div class="add__hint">Введите сумму в рублях</div>
-            <input type="text" class="add__input" placeholder="Описание">
+            <input type="text" class="add__input" id="descriptionInput" placeholder="Описание" maxlength="100">
             <div class="add__hint">Например: "Зарплата", "Продукты"</div>
-            <input type="text" class="add__input date-input" placeholder="Выберите дату" readonly>
+            <input type="text" class="add__input date-input" id="dateInput" placeholder="Выберите дату" readonly>
             <div class="add__hint">Нажмите на поле, чтобы выбрать дату</div>
-            <input type="date" id="real-date" class="visually-hidden">   
-            <a href="#" class="add__btn">+ Добавить операцию</a> 
+            <input type="date" id="realDateInput" class="visually-hidden">
+            <a href="#" class="add__btn" id="addBtn">+ Добавить операцию</a> 
         </div>
-        <div class="list">
+        
+        <div class="list plans">
             <div class="control-panel">
                 <h2 class="control-panel__title">Плановые траты</h2>
+                <div class="control-panel__categories categories">
+                    <div class="categories__item active" data-action="show-list">Список</div>
+                    <div class="categories__item" data-action="add-new">Добавить</div>
+                </div>
             </div>
-            <!-- <div class="list__no-history">Операций пока нет</div> -->
-             <label class="custom-checkbox">
-            <input type="checkbox" class="visually-hidden">
-            <span class="checkbox-icon"></span>
-            <p>дата</p>
-            <p>Название</p>
-            <p>Сумма</p>
-            </label>
+            <div class="plans-content">
+                <!-- Контент будет генерироваться JavaScript -->
+            </div>
         </div>
+        
         <div class="list history">
             <!-- Контент будет сгенерирован JavaScript -->
         </div>
     </main>
     
     <footer class="footer container">
-        <div class="footer__btn">Очистить данные</div>
+        <div class="footer__btn" id="clearBtn">Очистить данные</div>
         <div class="footer__sign">Оптимизировано для мобильных</div>
     </footer>
 
@@ -68,12 +77,12 @@
         <div class="calendar-content">
             <div class="calendar-header">
                 <div class="calendar-title" id="calendarTitle">Январь 2024</div>
-                <button class="calendar-close" id="calendarClose">×</button>
+                <button class="calendar-close" id="calendarClose" aria-label="Закрыть календарь">×</button>
             </div>
             
             <div class="calendar-navigation">
-                <button class="calendar-prev" id="calendarPrev">‹</button>
-                <button class="calendar-next" id="calendarNext">›</button>
+                <button class="calendar-prev" id="calendarPrev" aria-label="Предыдущий месяц">‹</button>
+                <button class="calendar-next" id="calendarNext" aria-label="Следующий месяц">›</button>
             </div>
             
             <div class="calendar-grid" id="calendarDays">
