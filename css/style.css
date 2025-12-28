@@ -97,13 +97,13 @@ input:focus {
     box-sizing: border-box; 
     margin-bottom: 8px;
     color: #FFFFFF;
-    appearance: none;
+    /* appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: none !important;
+    background-image: none !important; */
 }
 
-input[type="date"]::-webkit-calendar-picker-indicator {
+/* input[type="date"]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
@@ -114,7 +114,7 @@ input[type="date"]::-moz-calendar-picker-indicator {
 input[type="date"]::-ms-clear,
 input[type="date"]::-ms-reveal {
   display: none;
-}
+} */
 
 .add__input::placeholder {
     font-family: 'Inter';

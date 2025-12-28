@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,9 +26,9 @@
             <div class="control-panel">
                 <h2 class="control-panel__title">Добавить</h2>
                 <div class="control-panel__categories categories">
-                    <div class="categories__item active">Доходы</div>
-                    <div class="categories__item">Расходы</div>
-                    <div class="categories__item">Планы</div>
+                    <div class="categories__item active" data-type="income">Доходы</div>
+                    <div class="categories__item" data-type="expense">Расходы</div>
+                    <div class="categories__item" data-type="plan">Планы</div>
                 </div>
             </div>
             <input type="text" class="add__input" placeholder="Сумма">
@@ -74,5 +74,7 @@
         <div class="footer__btn">Очистить данные</div>
         <div class="footer__sign">Оптимизировано для мобильных</div>
     </footer>
+
+    <script src="js/app.js"></script>
 </body>
 </html>
