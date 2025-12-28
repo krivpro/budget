@@ -97,13 +97,13 @@ input:focus {
     box-sizing: border-box; 
     margin-bottom: 8px;
     color: #FFFFFF;
-    /* appearance: none;
+    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
-    background-image: none !important; */
+    background-image: none !important;
 }
 
-/* input[type="date"]::-webkit-calendar-picker-indicator {
+input[type="date"]::-webkit-calendar-picker-indicator {
   display: none !important;
 }
 
@@ -114,7 +114,7 @@ input[type="date"]::-moz-calendar-picker-indicator {
 input[type="date"]::-ms-clear,
 input[type="date"]::-ms-reveal {
   display: none;
-} */
+}
 
 .add__input::placeholder {
     font-family: 'Inter';
@@ -183,6 +183,7 @@ input[type="date"]::-ms-reveal {
 .categories__item {
     padding: 16px;
     border-radius: 8px;
+    cursor: pointer;
 }
 
 .list__no-history {
@@ -190,6 +191,12 @@ input[type="date"]::-ms-reveal {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    text-align: center;
+    color: #8A8A8A;
+    font-size: 16px;
+    width: 100%;
+    padding: 0 16px;
+    box-sizing: border-box;
 }
 
 .history {
@@ -198,6 +205,54 @@ input[type="date"]::-ms-reveal {
 
 .active {
     background-color: #FF7653;
+}
+
+/* Стили для списка операций */
+.operation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: #272727;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    transition: background-color 0.3s ease;
+}
+
+.operation:hover {
+    background: #333333;
+}
+
+.operation__info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.operation__description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 100%;
+}
+
+.operation__date {
+    font-size: 12px;
+    line-height: 100%;
+    color: #8A8A8A;
+}
+
+.operation__amount {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 100%;
+}
+
+.operation__amount--income {
+    color: #4CAF50;
+}
+
+.operation__amount--expense {
+    color: #FF7653;
 }
 
 /* Прячем нативный checkbox */
@@ -251,30 +306,6 @@ input[type="date"]::-ms-reveal {
   transform: rotate(45deg) translate(-1px, -1px);
 }
 
-/* Hover эффект */
-/* .custom-checkbox:hover .checkbox-icon {
-  border-color: #FF7653;
-} */
-
-/* Focus состояние для доступности */
-/* .visually-hidden:focus + .checkbox-icon {
-  outline: 2px solid #FF7653;
-  outline-offset: 2px;
-} */
-
-/* Disabled состояние */
-/* .visually-hidden:disabled + .checkbox-icon {
-  background: #f5f5f5;
-  border-color: #ddd;
-  cursor: not-allowed;
-} */
-
-.operation {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
 .footer {
     position: fixed;
     bottom: 0;
@@ -294,6 +325,157 @@ input[type="date"]::-ms-reveal {
     padding: 16px 24px;
     background: #FF7653;
     border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Стиль для поля даты */
+.date-input {
+    cursor: pointer;
+    position: relative;
+}
+
+.date-input::after {
+    content: "📅";
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Модальное окно календаря */
+.calendar-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.calendar-modal.active {
+    display: flex;
+}
+
+.calendar-content {
+    background-color: #2A2A2A;
+    border-radius: 20px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-title {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.calendar-close {
+    background: none;
+    border: none;
+    color: #FFFFFF;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    font-size: 12px;
+    color: #8A8A8A;
+    padding: 8px;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 12px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.calendar-day:hover {
+    background-color: #333333;
+}
+
+.calendar-day.selected {
+    background-color: #FF7653;
+}
+
+.calendar-day.other-month {
+    color: #8A8A8A;
+}
+
+.calendar-day.today {
+    border: 2px solid #4CAF50;
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-prev,
+.calendar-next {
+    background: #272727;
+    border: none;
+    color: #FFFFFF;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.calendar-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.calendar-btn.today {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.calendar-btn.clear {
+    background-color: #8A8A8A;
+    color: white;
+}
+
+.calendar-btn.confirm {
+    background-color: #FF7653;
+    color: white;
 }
 
 @media (max-width: 560px) {
