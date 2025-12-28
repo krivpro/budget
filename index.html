@@ -30,6 +30,44 @@
     </header>
     
     <main class="main container">
+
+        <div class="list chart">
+            <div class="control-panel">
+                <h2 class="control-panel__title">Статистика</h2>
+                <div class="control-panel__categories categories">
+                    <div class="categories__item active" data-chart-type="monthly">По месяцам</div>
+                    <div class="categories__item" data-chart-type="categories">По категориям</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="budgetChart" width="400" height="200"></canvas>
+            </div>
+            <div class="chart-stats">
+                <div class="chart-stat">
+                    <div class="chart-stat__label">Средний доход</div>
+                    <div class="chart-stat__value income">0,00 Р</div>
+                </div>
+                <div class="chart-stat">
+                    <div class="chart-stat__label">Средний расход</div>
+                    <div class="chart-stat__value expense">0,00 Р</div>
+                </div>
+                <div class="chart-stat">
+                    <div class="chart-stat__label">Баланс</div>
+                    <div class="chart-stat__value balance">0,00 Р</div>
+                </div>
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <div class="legend-color income"></div>
+                    <span>Доходы</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color expense"></div>
+                    <span>Расходы</span>
+                </div>
+            </div>
+        </div>
+
         <div class="add">
             <div class="control-panel">
                 <h2 class="control-panel__title">Добавить операцию</h2>
@@ -97,6 +135,8 @@
         </div>
     </div>
 
+    <!-- Подключаем Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>

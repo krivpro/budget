@@ -1,3 +1,13 @@
+// Константы цветов для графика
+const CHART_COLORS = {
+    income: '#4CAF50',
+    expense: '#FF7653',
+    balance: '#FFFFFF',
+    grid: '#3B3B3B',
+    text: '#8A8A8A',
+    background: '#272727'
+};
+
 // Структура данных приложения
 const budgetApp = {
     // Данные приложения
@@ -15,6 +25,9 @@ const budgetApp = {
     // Ссылки на элементы формы плана для календаря
     currentPlanDateInput: null,
     currentRealPlanDateInput: null,
+    
+    // Объект графика
+    chart: null,
     
     // Сохранение в localStorage
     saveToStorage() {
@@ -35,6 +48,7 @@ const budgetApp = {
         this.renderPlans();
         this.setupEventListeners();
         this.initCalendar();
+        this.initChart();
         console.log('Budget app initialized');
     },
     
@@ -265,6 +279,19 @@ const budgetApp = {
                 }
             });
         }
+        
+        // Обработчики для вкладок графика
+        const chartTabs = document.querySelectorAll('.chart .categories__item');
+        chartTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Убираем активный класс у всех
+                chartTabs.forEach(item => item.classList.remove('active'));
+                // Добавляем активный класс текущему
+                tab.classList.add('active');
+                // Перерисовываем график
+                this.renderChart();
+            });
+        });
     },
     
     // Очистка всех данных
@@ -281,6 +308,7 @@ const budgetApp = {
             this.renderTotals();
             this.renderOperations();
             this.renderPlans();
+            this.renderChart(); // Обновляем график
             this.saveToStorage();
             
             // Показываем уведомление
@@ -415,6 +443,9 @@ const budgetApp = {
         
         // Перерисовываем список операций
         this.renderOperations();
+        
+        // Обновляем график
+        this.renderChart();
         
         // Очищаем форму
         amountInput.value = '';
@@ -824,6 +855,370 @@ const budgetApp = {
         console.log('Добавлена новая плановая трата:', newPlan);
     },
     
+    // Инициализация графика
+    initChart() {
+        this.renderChart();
+    },
+    
+    // Получение данных для графика
+    getChartData() {
+        const activeTab = document.querySelector('.chart .categories__item.active');
+        const chartType = activeTab ? activeTab.dataset.chartType : 'monthly';
+        
+        if (chartType === 'monthly') {
+            return this.getMonthlyData();
+        } else {
+            return this.getCategoryData();
+        }
+    },
+    
+    // Получение данных по месяцам
+    getMonthlyData() {
+        // Группируем операции по месяцам
+        const monthlyData = {};
+        
+        this.data.operations.forEach(operation => {
+            const date = new Date(operation.date);
+            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            const monthName = date.toLocaleDateString('ru-RU', { 
+                month: 'short',
+                year: '2-digit'
+            });
+            
+            if (!monthlyData[monthKey]) {
+                monthlyData[monthKey] = {
+                    month: monthName,
+                    income: 0,
+                    expense: 0
+                };
+            }
+            
+            if (operation.type === 'income') {
+                monthlyData[monthKey].income += operation.amount;
+            } else {
+                monthlyData[monthKey].expense += operation.amount;
+            }
+        });
+        
+        // Преобразуем в массивы для графика
+        const months = [];
+        const incomes = [];
+        const expenses = [];
+        
+        // Сортируем по месяцам
+        Object.keys(monthlyData)
+            .sort()
+            .forEach(key => {
+                const data = monthlyData[key];
+                months.push(data.month);
+                incomes.push(data.income);
+                expenses.push(data.expense);
+            });
+        
+        // Берем последние 6 месяцев или все, если меньше
+        const lastMonths = months.slice(-6);
+        const lastIncomes = incomes.slice(-6);
+        const lastExpenses = expenses.slice(-6);
+        
+        // Если данных нет, показываем пустой график
+        if (lastMonths.length === 0) {
+            return {
+                labels: ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн'],
+                datasets: [
+                    {
+                        label: 'Доходы',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: CHART_COLORS.income + '80',
+                        borderColor: CHART_COLORS.income,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    },
+                    {
+                        label: 'Расходы',
+                        data: [0, 0, 0, 0, 0, 0],
+                        backgroundColor: CHART_COLORS.expense + '80',
+                        borderColor: CHART_COLORS.expense,
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }
+                ]
+            };
+        }
+        
+        return {
+            labels: lastMonths,
+            datasets: [
+                {
+                    label: 'Доходы',
+                    data: lastIncomes,
+                    backgroundColor: CHART_COLORS.income,
+                    borderColor: CHART_COLORS.income,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                },
+                {
+                    label: 'Расходы',
+                    data: lastExpenses,
+                    backgroundColor: CHART_COLORS.expense,
+                    borderColor: CHART_COLORS.expense,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }
+            ]
+        };
+    },
+    
+    // Получение данных по категориям
+    getCategoryData() {
+        // Группируем по описаниям (категориям)
+        const categoryData = {};
+        
+        this.data.operations.forEach(operation => {
+            const category = operation.description;
+            const type = operation.type;
+            
+            if (!categoryData[category]) {
+                categoryData[category] = {
+                    income: 0,
+                    expense: 0,
+                    total: 0
+                };
+            }
+            
+            if (type === 'income') {
+                categoryData[category].income += operation.amount;
+            } else {
+                categoryData[category].expense += operation.amount;
+            }
+            
+            categoryData[category].total = categoryData[category].income + categoryData[category].expense;
+        });
+        
+        // Преобразуем в массив и сортируем по общей сумме
+        const categories = Object.entries(categoryData)
+            .map(([name, data]) => ({
+                name,
+                total: data.total,
+                color: data.income > data.expense ? CHART_COLORS.income : CHART_COLORS.expense
+            }))
+            .sort((a, b) => b.total - a.total)
+            .slice(0, 8); // Берем топ-8 категорий
+        
+        // Если данных нет, показываем пустой график
+        if (categories.length === 0) {
+            return {
+                labels: ['Нет данных'],
+                datasets: [{
+                    label: 'Данных пока нет',
+                    data: [1],
+                    backgroundColor: CHART_COLORS.text,
+                    borderColor: CHART_COLORS.text,
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            };
+        }
+        
+        const labels = categories.map(item => 
+            item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name
+        );
+        
+        const data = categories.map(item => item.total);
+        const colors = categories.map(item => item.color);
+        
+        return {
+            labels,
+            datasets: [{
+                label: 'Сумма по категориям',
+                data,
+                backgroundColor: colors,
+                borderColor: colors,
+                borderWidth: 2,
+                borderRadius: 4
+            }]
+        };
+    },
+    
+    // Рендеринг графика
+    renderChart() {
+        const canvas = document.getElementById('budgetChart');
+        if (!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        // Очищаем предыдущий график
+        if (this.chart) {
+            this.chart.destroy();
+        }
+        
+        const chartData = this.getChartData();
+        const activeTab = document.querySelector('.chart .categories__item.active');
+        const chartType = activeTab ? activeTab.dataset.chartType : 'monthly';
+        
+        // Определяем тип графика
+        const isMonthlyChart = chartType === 'monthly';
+        
+        // Создаем новый график
+        this.chart = new Chart(ctx, {
+            type: 'bar',
+            data: chartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: isMonthlyChart,
+                        position: 'top',
+                        labels: {
+                            color: CHART_COLORS.text,
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 12
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: '#2A2A2A',
+                        titleColor: '#FFFFFF',
+                        bodyColor: '#FFFFFF',
+                        borderColor: CHART_COLORS.grid,
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                const value = context.parsed.y;
+                                label += new Intl.NumberFormat('ru-RU', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }).format(value) + ' Р';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: CHART_COLORS.grid,
+                            drawBorder: false,
+                            display: true
+                        },
+                        ticks: {
+                            color: CHART_COLORS.text,
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 11
+                            },
+                            maxRotation: isMonthlyChart ? 0 : 45
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: CHART_COLORS.grid,
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: CHART_COLORS.text,
+                            font: {
+                                family: "'Inter', sans-serif",
+                                size: 11
+                            },
+                            callback: function(value) {
+                                if (value >= 10000) {
+                                    return (value / 1000).toFixed(0) + 'k';
+                                }
+                                return value;
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+        
+        // Обновляем статистику
+        this.updateChartStats();
+    },
+    
+    // Обновление статистики под графиком
+    updateChartStats() {
+        if (this.data.operations.length === 0) {
+            this.updateEmptyStats();
+            return;
+        }
+        
+        const incomeElements = this.data.operations.filter(op => op.type === 'income');
+        const expenseElements = this.data.operations.filter(op => op.type === 'expense');
+        
+        // Средний доход
+        const avgIncome = incomeElements.length > 0 
+            ? incomeElements.reduce((sum, op) => sum + op.amount, 0) / incomeElements.length
+            : 0;
+        
+        // Средний расход
+        const avgExpense = expenseElements.length > 0
+            ? expenseElements.reduce((sum, op) => sum + op.amount, 0) / expenseElements.length
+            : 0;
+        
+        // Общий баланс
+        const totalBalance = this.data.balance || 0;
+        
+        // Обновляем DOM
+        const avgIncomeElement = document.querySelector('.chart-stat__value.income');
+        const avgExpenseElement = document.querySelector('.chart-stat__value.expense');
+        const totalBalanceElement = document.querySelector('.chart-stat__value.balance');
+        
+        if (avgIncomeElement) {
+            avgIncomeElement.textContent = `${this.formatCurrency(avgIncome)} Р`;
+        }
+        
+        if (avgExpenseElement) {
+            avgExpenseElement.textContent = `${this.formatCurrency(avgExpense)} Р`;
+        }
+        
+        if (totalBalanceElement) {
+            totalBalanceElement.textContent = `${totalBalance > 0 ? '+' : ''}${this.formatCurrency(totalBalance)} Р`;
+            totalBalanceElement.style.color = totalBalance > 0 ? CHART_COLORS.income : 
+                                             totalBalance < 0 ? CHART_COLORS.expense : 
+                                             '#FFFFFF';
+        }
+    },
+    
+    // Обновление статистики при отсутствии данных
+    updateEmptyStats() {
+        const avgIncomeElement = document.querySelector('.chart-stat__value.income');
+        const avgExpenseElement = document.querySelector('.chart-stat__value.expense');
+        const totalBalanceElement = document.querySelector('.chart-stat__value.balance');
+        
+        if (avgIncomeElement) avgIncomeElement.textContent = '0,00 Р';
+        if (avgExpenseElement) avgExpenseElement.textContent = '0,00 Р';
+        if (totalBalanceElement) {
+            totalBalanceElement.textContent = '0,00 Р';
+            totalBalanceElement.style.color = '#FFFFFF';
+        }
+    },
+    
     // Инициализация календаря
     initCalendar() {
         this.currentSelectedDate = new Date();
@@ -1052,6 +1447,7 @@ document.addEventListener('DOMContentLoaded', () => {
             budgetApp.renderTotals();
             budgetApp.renderOperations();
             budgetApp.renderPlans();
+            budgetApp.renderChart();
         }
     });
 });
