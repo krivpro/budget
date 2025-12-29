@@ -1163,3 +1163,364 @@ html {
         opacity: 1;
     }
 }
+
+/* Новый цвет для ожидаемых доходов */
+.expected {
+    color: #FFB74D; /* Оранжевый для ожидаемых */
+}
+
+.header__item.header__expected .header__sum {
+    color: #FFB74D;
+}
+
+.legend-color.expected {
+    background-color: #FFB74D;
+}
+
+.chart-stat__value.expected {
+    color: #FFB74D;
+}
+
+/* Слайдер вероятности */
+.probability-slider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.probability-input {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #272727;
+    border-radius: 3px;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.probability-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FF7653;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.probability-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FF7653;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.probability-value {
+    min-width: 50px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #FFB74D;
+}
+
+/* Стили для ожидаемых доходов в списке */
+.expected-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #272727;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    border-left: 4px solid #FFB74D;
+}
+
+.expected-item:hover {
+    background: #333333;
+    transform: translateX(4px);
+}
+
+.expected-item.received {
+    opacity: 0.7;
+    border-left-color: #4CAF50;
+}
+
+.expected-item.canceled {
+    opacity: 0.5;
+    border-left-color: #8A8A8A;
+}
+
+.expected-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.expected-description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.2;
+    color: #FFFFFF;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.expected-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: #8A8A8A;
+}
+
+.expected-client {
+    background: rgba(255, 183, 77, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #FFB74D;
+}
+
+.expected-category {
+    background: rgba(76, 175, 80, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #4CAF50;
+}
+
+.expected-probability {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.probability-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.probability-indicator.high {
+    background-color: #4CAF50;
+}
+
+.probability-indicator.medium {
+    background-color: #FFB74D;
+}
+
+.probability-indicator.low {
+    background-color: #FF7653;
+}
+
+.expected-amount {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    color: #FFB74D;
+    margin-right: 40px;
+}
+
+.expected-actions {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.expected-btn {
+    background: none;
+    border: none;
+    color: #8A8A8A;
+    font-size: 20px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.expected-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.expected-btn.receive:hover {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.expected-btn.cancel:hover {
+    color: #FF7653;
+    background: rgba(255, 118, 83, 0.1);
+}
+
+.expected-btn.delete:hover {
+    color: #F44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* Индикаторы статуса в шапке */
+.header__expected .header__sum {
+    position: relative;
+}
+
+.expected-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2A2A2A;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #8A8A8A;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.header__expected:hover .expected-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Адаптивность для 4 элементов в шапке */
+@media (max-width: 768px) {
+    .header {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto repeat(3, 1fr);
+        row-gap: 20px;
+    }
+    
+    .header__logo {
+        grid-column: span 2;
+    }
+    
+    .header__income,
+    .header__expenses {
+        grid-column: span 1;
+    }
+    
+    .header__balance {
+        grid-column: span 1;
+    }
+    
+    .header__expected {
+        grid-column: span 1;
+    }
+    
+    .chart-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 560px) {
+    .header {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto repeat(2, auto);
+    }
+    
+    .header__logo {
+        grid-column: span 2;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected {
+        grid-column: span 1;
+        padding: 16px 12px;
+    }
+    
+    .header__sum {
+        font-size: 18px;
+    }
+    
+    .expected-item {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .expected-amount {
+        margin-right: 0;
+        order: 3;
+        width: 100%;
+        text-align: right;
+    }
+    
+    .expected-actions {
+        position: static;
+        order: 4;
+        transform: none;
+        margin-left: auto;
+    }
+    
+    .expected-details {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 400px) {
+    .header__item {
+        padding: 14px 10px;
+    }
+    
+    .header__sum {
+        font-size: 16px;
+    }
+    
+    .expected-description {
+        font-size: 15px;
+    }
+    
+    .expected-amount {
+        font-size: 15px;
+    }
+}
+
+/* Форма с select */
+.form-label {
+    display: block;
+    font-size: 14px;
+    color: #8A8A8A;
+    margin-bottom: 8px;
+}
+
+.add__input[type="range"] {
+    padding: 0;
+}
+
+.add__input select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 50px;
+}
+
+/* Пустой список ожидаемых доходов */
+.no-expected {
+    text-align: center;
+    color: #8A8A8A;
+    font-size: 16px;
+    padding: 40px 0;
+}

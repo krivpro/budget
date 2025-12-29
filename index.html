@@ -27,16 +27,24 @@
             <div class="header__title">Остаток</div>
             <div class="balance__sum header__sum sum">0,00 Р</div>
         </div>
+        
+        <!-- Новый элемент для ожидаемых доходов -->
+        <div class="header__item header__expected expected">
+            <div class="header__title">Ожидаемые</div>
+            <div class="expected__sum header__sum sum">0,00 Р</div>
+        </div>
     </header>
     
     <main class="main container">
-
+        <!-- График статистики (без изменений) -->
         <div class="list chart">
             <div class="control-panel">
                 <h2 class="control-panel__title">Статистика</h2>
                 <div class="control-panel__categories categories">
                     <div class="categories__item active" data-chart-type="monthly">По месяцам</div>
                     <div class="categories__item" data-chart-type="categories">По категориям</div>
+                    <!-- Новая вкладка для прогноза -->
+                    <div class="categories__item" data-chart-type="forecast">Прогноз</div>
                 </div>
             </div>
             <div class="chart-container">
@@ -55,6 +63,10 @@
                     <div class="chart-stat__label">Баланс</div>
                     <div class="chart-stat__value balance">0,00 Р</div>
                 </div>
+                <div class="chart-stat">
+                    <div class="chart-stat__label">Ожидается</div>
+                    <div class="chart-stat__value expected">0,00 Р</div>
+                </div>
             </div>
             <div class="chart-legend">
                 <div class="legend-item">
@@ -65,28 +77,83 @@
                     <div class="legend-color expense"></div>
                     <span>Расходы</span>
                 </div>
+                <div class="legend-item">
+                    <div class="legend-color expected"></div>
+                    <span>Ожидаемые</span>
+                </div>
             </div>
         </div>
 
+        <!-- Форма добавления операции (расширена) -->
         <div class="add">
             <div class="control-panel">
                 <h2 class="control-panel__title">Добавить операцию</h2>
                 <div class="control-panel__categories categories">
                     <div class="categories__item active" data-type="income">Доходы</div>
                     <div class="categories__item" data-type="expense">Расходы</div>
+                    <div class="categories__item" data-type="expected">Ожидаемые</div>
                     <div class="categories__item" data-type="plan">Планы</div>
                 </div>
             </div>
+            
+            <!-- Общие поля -->
             <input type="text" class="add__input" id="amountInput" placeholder="Сумма" inputmode="decimal">
             <div class="add__hint">Введите сумму в рублях</div>
+            
             <input type="text" class="add__input" id="descriptionInput" placeholder="Описание" maxlength="100">
             <div class="add__hint">Например: "Зарплата", "Продукты"</div>
+            
             <input type="text" class="add__input date-input" id="dateInput" placeholder="Выберите дату" readonly>
             <div class="add__hint">Нажмите на поле, чтобы выбрать дату</div>
             <input type="date" id="realDateInput" class="visually-hidden">
+            
+            <!-- Дополнительные поля для ожидаемых доходов (скрыты по умолчанию) -->
+            <div class="expected-fields" id="expectedFields" style="display: none;">
+                <div class="form-row">
+                    <label class="form-label">Вероятность получения</label>
+                    <div class="probability-slider">
+                        <input type="range" class="add__input probability-input" id="probabilityInput" 
+                               min="0" max="100" value="100">
+                        <div class="probability-value" id="probabilityValue">100%</div>
+                    </div>
+                    <div class="add__hint">Оцените вероятность получения дохода</div>
+                </div>
+                
+                <input type="text" class="add__input" id="clientInput" placeholder="Клиент/источник">
+                <div class="add__hint">Например: "ООО Ромашка", "Upwork"</div>
+                
+                <div class="form-row">
+                    <label class="form-label">Категория дохода</label>
+                    <select class="add__input" id="incomeCategory">
+                        <option value="freelance">Фриланс</option>
+                        <option value="salary">Зарплата</option>
+                        <option value="investment">Инвестиции</option>
+                        <option value="sales">Продажи</option>
+                        <option value="other">Другое</option>
+                    </select>
+                </div>
+            </div>
+            
             <a href="#" class="add__btn" id="addBtn">+ Добавить операцию</a> 
         </div>
         
+        <!-- Новый раздел: Ожидаемые доходы -->
+        <div class="list expected">
+            <div class="control-panel">
+                <h2 class="control-panel__title">Ожидаемые доходы</h2>
+                <div class="control-panel__categories categories">
+                    <div class="categories__item active" data-status="all">Все</div>
+                    <div class="categories__item" data-status="pending">Ожидаются</div>
+                    <div class="categories__item" data-status="received">Получены</div>
+                    <div class="categories__item" data-status="canceled">Отменены</div>
+                </div>
+            </div>
+            <div class="expected-content">
+                <!-- Контент будет генерироваться JavaScript -->
+            </div>
+        </div>
+        
+        <!-- Плановые траты (без изменений) -->
         <div class="list plans">
             <div class="control-panel">
                 <h2 class="control-panel__title">Плановые траты</h2>
@@ -100,6 +167,7 @@
             </div>
         </div>
         
+        <!-- История операций (без изменений) -->
         <div class="list history">
             <!-- Контент будет сгенерирован JavaScript -->
         </div>
@@ -110,7 +178,7 @@
         <div class="footer__sign">Оптимизировано для мобильных</div>
     </footer>
 
-    <!-- Модальное окно календаря -->
+    <!-- Модальное окно календаря (без изменений) -->
     <div class="calendar-modal" id="calendarModal">
         <div class="calendar-content">
             <div class="calendar-header">
