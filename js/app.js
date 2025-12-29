@@ -2,10 +2,20 @@
 const CHART_COLORS = {
     income: '#4CAF50',
     expense: '#FF7653',
+    expected: '#FFB74D',
     balance: '#FFFFFF',
     grid: '#3B3B3B',
     text: '#8A8A8A',
     background: '#272727'
+};
+
+// Категории доходов
+const INCOME_CATEGORIES = {
+    freelance: { name: 'Фриланс', color: '#FFB74D' },
+    salary: { name: 'Зарплата', color: '#4CAF50' },
+    investment: { name: 'Инвестиции', color: '#2196F3' },
+    sales: { name: 'Продажи', color: '#9C27B0' },
+    other: { name: 'Другое', color: '#607D8B' }
 };
 
 // Структура данных приложения
@@ -14,8 +24,10 @@ const budgetApp = {
     data: {
         operations: JSON.parse(localStorage.getItem('budgetOperations')) || [],
         plannedExpenses: JSON.parse(localStorage.getItem('budgetPlannedExpenses')) || [],
+        expectedIncomes: JSON.parse(localStorage.getItem('budgetExpectedIncomes')) || [],
         incomeTotal: 0,
         expensesTotal: 0,
+        expectedTotal: 0,
         balance: 0
     },
     
@@ -34,6 +46,7 @@ const budgetApp = {
         try {
             localStorage.setItem('budgetOperations', JSON.stringify(this.data.operations));
             localStorage.setItem('budgetPlannedExpenses', JSON.stringify(this.data.plannedExpenses));
+            localStorage.setItem('budgetExpectedIncomes', JSON.stringify(this.data.expectedIncomes));
         } catch (error) {
             console.error('Ошибка сохранения в localStorage:', error);
             this.showNotification('Ошибка сохранения данных. Возможно, недостаточно места в хранилище.', 'error');
@@ -46,22 +59,32 @@ const budgetApp = {
         this.renderTotals();
         this.renderOperations();
         this.renderPlans();
+        this.renderExpectedIncomes();
         this.setupEventListeners();
         this.initCalendar();
         this.initChart();
-        console.log('Budget app initialized');
+        console.log('Budget app initialized with expected incomes feature');
     },
     
     // Расчет итоговых сумм
     calculateTotals() {
         this.data.incomeTotal = 0;
         this.data.expensesTotal = 0;
+        this.data.expectedTotal = 0;
         
+        // Рассчитываем фактические доходы и расходы
         this.data.operations.forEach(operation => {
             if (operation.type === 'income') {
                 this.data.incomeTotal += operation.amount;
             } else if (operation.type === 'expense') {
                 this.data.expensesTotal += operation.amount;
+            }
+        });
+        
+        // Рассчитываем ожидаемые доходы (только ожидающиеся)
+        this.data.expectedIncomes.forEach(income => {
+            if (income.status === 'pending') {
+                this.data.expectedTotal += income.amount;
             }
         });
         
@@ -74,6 +97,7 @@ const budgetApp = {
         const incomeElement = document.querySelector('.income__sum');
         const expensesElement = document.querySelector('.expenses__sum');
         const balanceElement = document.querySelector('.balance__sum');
+        const expectedElement = document.querySelector('.expected__sum');
         const balanceContainer = document.querySelector('.header__balance');
         
         if (incomeElement) {
@@ -82,6 +106,10 @@ const budgetApp = {
         
         if (expensesElement) {
             expensesElement.textContent = `${this.formatCurrency(this.data.expensesTotal)} Р`;
+        }
+        
+        if (expectedElement) {
+            expectedElement.textContent = `${this.formatCurrency(this.data.expectedTotal)} Р`;
         }
         
         if (balanceElement) {
@@ -107,6 +135,21 @@ const budgetApp = {
                 } else {
                     balanceContainer.classList.add('neutral');
                 }
+            }
+        }
+        
+        // Добавляем тултип для ожидаемых доходов
+        const expectedHeader = document.querySelector('.header__expected');
+        if (expectedHeader) {
+            let expectedTooltip = expectedHeader.querySelector('.expected-tooltip');
+            if (!expectedTooltip) {
+                expectedTooltip = document.createElement('div');
+                expectedTooltip.className = 'expected-tooltip';
+                expectedTooltip.innerHTML = `
+                    <div>Ожидаемые доходы</div>
+                    <div style="font-size: 11px; margin-top: 2px;">(еще не получены)</div>
+                `;
+                expectedHeader.appendChild(expectedTooltip);
             }
         }
     },
@@ -174,8 +217,35 @@ const budgetApp = {
                 addCategoryItems.forEach(i => i.classList.remove('active'));
                 // Добавляем активный класс текущему
                 item.classList.add('active');
+                
+                // Показываем/скрываем дополнительные поля для ожидаемых доходов
+                const expectedFields = document.getElementById('expectedFields');
+                if (item.dataset.type === 'expected') {
+                    expectedFields.style.display = 'block';
+                    // Обновляем текст кнопки
+                    const addBtn = document.getElementById('addBtn');
+                    if (addBtn) {
+                        addBtn.textContent = '+ Добавить ожидаемый доход';
+                    }
+                } else {
+                    expectedFields.style.display = 'none';
+                    // Восстанавливаем текст кнопки
+                    const addBtn = document.getElementById('addBtn');
+                    if (addBtn) {
+                        addBtn.textContent = '+ Добавить операцию';
+                    }
+                }
             });
         });
+        
+        // Обработчик слайдера вероятности
+        const probabilityInput = document.getElementById('probabilityInput');
+        const probabilityValue = document.getElementById('probabilityValue');
+        if (probabilityInput && probabilityValue) {
+            probabilityInput.addEventListener('input', (e) => {
+                probabilityValue.textContent = `${e.target.value}%`;
+            });
+        }
         
         // Обработчик кнопки очистки данных
         const clearButton = document.getElementById('clearBtn');
@@ -192,7 +262,7 @@ const budgetApp = {
             dateInput.addEventListener('click', () => this.openCalendar());
         }
         
-        // Обработчики для календаря
+        // Обработчики для календаря (без изменений)
         const calendarClose = document.getElementById('calendarClose');
         if (calendarClose) {
             calendarClose.addEventListener('click', () => this.closeCalendar());
@@ -240,7 +310,20 @@ const budgetApp = {
             }
         });
         
-        // Обработчики для вкладок планов
+        // Обработчики для вкладок ожидаемых доходов
+        const expectedTabs = document.querySelectorAll('.expected .categories__item');
+        expectedTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Убираем активный класс у всех
+                expectedTabs.forEach(item => item.classList.remove('active'));
+                // Добавляем активный класс текущему
+                tab.classList.add('active');
+                // Перерисовываем ожидаемые доходы
+                this.renderExpectedIncomes();
+            });
+        });
+        
+        // Обработчики для вкладок планов (без изменений)
         const planTabs = document.querySelectorAll('.plans .categories__item');
         planTabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -250,6 +333,19 @@ const budgetApp = {
                 tab.classList.add('active');
                 // Перерисовываем планы
                 this.renderPlans();
+            });
+        });
+        
+        // Обработчики для вкладок графика
+        const chartTabs = document.querySelectorAll('.chart .categories__item');
+        chartTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Убираем активный класс у всех
+                chartTabs.forEach(item => item.classList.remove('active'));
+                // Добавляем активный класс текущему
+                tab.classList.add('active');
+                // Перерисовываем график
+                this.renderChart();
             });
         });
         
@@ -279,24 +375,13 @@ const budgetApp = {
                 }
             });
         }
-        
-        // Обработчики для вкладок графика
-        const chartTabs = document.querySelectorAll('.chart .categories__item');
-        chartTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Убираем активный класс у всех
-                chartTabs.forEach(item => item.classList.remove('active'));
-                // Добавляем активный класс текущему
-                tab.classList.add('active');
-                // Перерисовываем график
-                this.renderChart();
-            });
-        });
     },
     
     // Очистка всех данных
     clearAllData() {
-        if (this.data.operations.length === 0 && this.data.plannedExpenses.length === 0) {
+        if (this.data.operations.length === 0 && 
+            this.data.plannedExpenses.length === 0 &&
+            this.data.expectedIncomes.length === 0) {
             this.showNotification('Нет данных для очистки', 'error');
             return;
         }
@@ -304,14 +389,15 @@ const budgetApp = {
         if (confirm('Вы уверены, что хотите удалить все данные? Это действие нельзя отменить.')) {
             this.data.operations = [];
             this.data.plannedExpenses = [];
+            this.data.expectedIncomes = [];
             this.calculateTotals();
             this.renderTotals();
             this.renderOperations();
             this.renderPlans();
-            this.renderChart(); // Обновляем график
+            this.renderExpectedIncomes();
+            this.renderChart();
             this.saveToStorage();
             
-            // Показываем уведомление
             this.showNotification('Все данные успешно удалены');
         }
     },
@@ -363,17 +449,16 @@ const budgetApp = {
         }, 3000);
     },
     
-    // Добавление новой операции
+    // Добавление новой операции (обновлено для ожидаемых доходов)
     addOperation() {
         // Получаем выбранный тип операции
         const activeCategory = document.querySelector('.add .categories__item.active');
         if (!activeCategory) return;
         
-        const operationType = activeCategory.textContent.toLowerCase();
+        const operationType = activeCategory.dataset.type;
         
-        // Проверяем, что это не "Планы"
-        if (operationType === 'планы') {
-            // Переключаемся на вкладку "Добавить" в планах
+        // Если это планы - переключаемся на соответствующий раздел
+        if (operationType === 'plan') {
             const addTab = document.querySelector('.plans .categories__item[data-action="add-new"]');
             if (addTab) {
                 const planTabs = document.querySelectorAll('.plans .categories__item');
@@ -381,7 +466,6 @@ const budgetApp = {
                 addTab.classList.add('active');
                 this.renderPlans();
                 
-                // Прокручиваем к блоку планов
                 const plansBlock = document.querySelector('.plans');
                 if (plansBlock) {
                     plansBlock.scrollIntoView({ 
@@ -421,35 +505,83 @@ const budgetApp = {
             return;
         }
         
-        // Создаем новую операцию
-        const newOperation = {
-            id: Date.now(),
-            type: operationType === 'доходы' ? 'income' : 'expense',
-            amount: parseFloat(amount.toFixed(2)),
-            description: description,
-            date: date,
-            createdAt: new Date().toISOString()
-        };
+        // Обрабатываем разные типы операций
+        if (operationType === 'expected') {
+            // Добавление ожидаемого дохода
+            const probabilityInput = document.getElementById('probabilityInput');
+            const clientInput = document.getElementById('clientInput');
+            const incomeCategory = document.getElementById('incomeCategory');
+            
+            const probability = probabilityInput ? parseInt(probabilityInput.value) : 100;
+            const client = clientInput ? clientInput.value.trim() : '';
+            const category = incomeCategory ? incomeCategory.value : 'other';
+            
+            if (client && client.length > 50) {
+                this.showNotification('Имя клиента слишком длинное', 'error');
+                clientInput.focus();
+                return;
+            }
+            
+            const newExpectedIncome = {
+                id: Date.now(),
+                type: 'expected',
+                amount: parseFloat(amount.toFixed(2)),
+                description: description,
+                date: date,
+                status: 'pending',
+                probability: probability,
+                client: client,
+                category: category,
+                createdAt: new Date().toISOString(),
+                receivedDate: null
+            };
+            
+            this.data.expectedIncomes.push(newExpectedIncome);
+            this.showNotification(`Ожидаемый доход "${description}" успешно добавлен`);
+            
+            // Перерисовываем ожидаемые доходы
+            this.renderExpectedIncomes();
+            
+        } else {
+            // Добавление обычной операции (доход/расход)
+            const newOperation = {
+                id: Date.now(),
+                type: operationType,
+                amount: parseFloat(amount.toFixed(2)),
+                description: description,
+                date: date,
+                createdAt: new Date().toISOString()
+            };
+            
+            this.data.operations.push(newOperation);
+            
+            const operationTypeText = operationType === 'income' ? 'доход' : 'расход';
+            this.showNotification(`${operationTypeText} "${description}" успешно добавлен`);
+            
+            // Перерисовываем операции
+            this.renderOperations();
+        }
         
-        // Добавляем в данные
-        this.data.operations.push(newOperation);
-        
-        // Обновляем расчеты
+        // Общие действия для всех типов операций
         this.calculateTotals();
         this.renderTotals();
-        
-        // Сохраняем в localStorage
         this.saveToStorage();
-        
-        // Перерисовываем список операций
-        this.renderOperations();
-        
-        // Обновляем график
         this.renderChart();
         
         // Очищаем форму
         amountInput.value = '';
         descriptionInput.value = '';
+        
+        // Очищаем дополнительные поля для ожидаемых доходов
+        const probabilityInput = document.getElementById('probabilityInput');
+        const probabilityValue = document.getElementById('probabilityValue');
+        const clientInput = document.getElementById('clientInput');
+        const incomeCategory = document.getElementById('incomeCategory');
+        
+        if (probabilityInput) probabilityInput.value = 100;
+        if (probabilityValue) probabilityValue.textContent = '100%';
+        if (clientInput) clientInput.value = '';
+        if (incomeCategory) incomeCategory.value = 'freelance';
         
         // Очищаем дату
         const dateInput = document.getElementById('dateInput');
@@ -459,15 +591,9 @@ const budgetApp = {
         if (realDateInput) {
             realDateInput.value = '';
         }
-        
-        // Показываем уведомление
-        const operationTypeText = operationType === 'доходы' ? 'доход' : 'расход';
-        this.showNotification(`${operationTypeText} "${description}" успешно добавлен`);
-        
-        console.log('Добавлена новая операция:', newOperation);
     },
     
-    // Отображение списка операций
+    // Отображение списка операций (обновлено с новым стилем)
     renderOperations() {
         const operationsContainer = document.querySelector('.history');
         if (!operationsContainer) return;
@@ -491,22 +617,6 @@ const budgetApp = {
         filteredOperations.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         // Создаем HTML для операций
-        if (filteredOperations.length === 0) {
-            operationsContainer.innerHTML = `
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Список операций</h2>
-                    <div class="control-panel__categories categories">
-                        <div class="categories__item active">Все</div>
-                        <div class="categories__item">Доходы</div>
-                        <div class="categories__item">Расходы</div>
-                    </div>
-                </div>
-                <div class="list__no-history">Операций пока нет</div>
-            `;
-            this.setupFilterListeners();
-            return;
-        }
-        
         let operationsHTML = `
             <div class="control-panel">
                 <h2 class="control-panel__title">Список операций</h2>
@@ -518,21 +628,44 @@ const budgetApp = {
             </div>
         `;
         
-        filteredOperations.forEach(operation => {
-            const formattedDate = this.formatDate(operation.date);
-            const amountClass = operation.type === 'income' ? 'operation__amount--income' : 'operation__amount--expense';
-            const amountSign = operation.type === 'income' ? '+' : '-';
-            
+        if (filteredOperations.length === 0) {
             operationsHTML += `
-                <div class="operation" data-id="${operation.id}">
-                    <div class="operation__info">
-                        <p class="operation__description">${operation.description}</p>
-                        <p class="operation__date">${formattedDate}</p>
+                <div class="list__no-data list__no-data--history">
+                    <div class="list__no-data__description">
+                        ${this.data.operations.length === 0 
+                            ? 'Операций пока нет' 
+                            : filterType === 'all' 
+                                ? 'Нет операций' 
+                                : filterType === 'income' 
+                                    ? 'Нет доходов' 
+                                    : 'Нет расходов'}
                     </div>
-                    <p class="operation__amount ${amountClass}">${amountSign}${this.formatCurrency(operation.amount)} Р</p>
+                    <div class="list__no-data__hint">
+                        ${this.data.operations.length === 0 
+                            ? 'Добавьте первую операцию в форме выше' 
+                            : filterType === 'income' 
+                                ? 'Переключитесь на "Все" или "Расходы"' 
+                                : 'Переключитесь на "Все" или "Доходы"'}
+                    </div>
                 </div>
             `;
-        });
+        } else {
+            filteredOperations.forEach(operation => {
+                const formattedDate = this.formatDate(operation.date);
+                const amountClass = operation.type === 'income' ? 'operation__amount--income' : 'operation__amount--expense';
+                const amountSign = operation.type === 'income' ? '+' : '-';
+                
+                operationsHTML += `
+                    <div class="operation" data-id="${operation.id}">
+                        <div class="operation__info">
+                            <p class="operation__description">${operation.description}</p>
+                            <p class="operation__date">${formattedDate}</p>
+                        </div>
+                        <p class="operation__amount ${amountClass}">${amountSign}${this.formatCurrency(operation.amount)} Р</p>
+                    </div>
+                `;
+            });
+        }
         
         operationsContainer.innerHTML = operationsHTML;
         this.setupFilterListeners();
@@ -563,7 +696,202 @@ const budgetApp = {
         });
     },
     
-    // Отображение плановых трат
+    // Отображение ожидаемых доходов (обновлено с новым стилем)
+    renderExpectedIncomes() {
+        const expectedContainer = document.querySelector('.expected-content');
+        if (!expectedContainer) return;
+        
+        // Определяем активную вкладку
+        const activeTab = document.querySelector('.expected .categories__item.active');
+        const statusFilter = activeTab ? activeTab.dataset.status : 'all';
+        
+        // Фильтруем ожидаемые доходы по статусу
+        let filteredIncomes = this.data.expectedIncomes;
+        if (statusFilter !== 'all') {
+            filteredIncomes = this.data.expectedIncomes.filter(income => income.status === statusFilter);
+        }
+        
+        // Сортируем по дате (ближайшие сверху)
+        filteredIncomes.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        if (filteredIncomes.length === 0) {
+            let message = 'Ожидаемых доходов пока нет';
+            let hint = 'Добавьте ожидаемый доход в форме выше';
+            
+            if (statusFilter === 'pending') {
+                message = 'Нет ожидаемых доходов';
+                hint = 'Все доходы получены или отменены';
+            } else if (statusFilter === 'received') {
+                message = 'Нет полученных ожидаемых доходов';
+                hint = 'Пока нет доходов, отмеченных как полученные';
+            } else if (statusFilter === 'canceled') {
+                message = 'Нет отмененных ожидаемых доходов';
+                hint = 'Пока нет отмененных ожидаемых доходов';
+            }
+            
+            expectedContainer.innerHTML = `
+                <div class="list__no-data list__no-data--expected">
+                    <div class="list__no-data__description">${message}</div>
+                    <div class="list__no-data__hint">${hint}</div>
+                </div>
+            `;
+            return;
+        }
+        
+        let expectedHTML = '';
+        
+        filteredIncomes.forEach(income => {
+            const formattedDate = this.formatDate(income.date);
+            const probabilityClass = this.getProbabilityClass(income.probability);
+            const categoryInfo = INCOME_CATEGORIES[income.category] || INCOME_CATEGORIES.other;
+            
+            expectedHTML += `
+                <div class="expected-item ${income.status}" data-id="${income.id}">
+                    <div class="expected-info">
+                        <p class="expected-description">${income.description}</p>
+                        <div class="expected-details">
+                            <span class="expected-date">${formattedDate}</span>
+                            ${income.client ? `<span class="expected-client">${income.client}</span>` : ''}
+                            <span class="expected-category">${categoryInfo.name}</span>
+                            <span class="expected-probability">
+                                <div class="probability-indicator ${probabilityClass}"></div>
+                                ${income.probability}%
+                            </span>
+                        </div>
+                    </div>
+                    <p class="expected-amount">${this.formatCurrency(income.amount)} Р</p>
+                    <div class="expected-actions">
+                        ${income.status === 'pending' ? `
+                            <button class="expected-btn receive" title="Отметить как полученный">✓</button>
+                            <button class="expected-btn cancel" title="Отменить ожидаемый доход">×</button>
+                        ` : ''}
+                        <button class="expected-btn delete" title="Удалить">🗑</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        expectedContainer.innerHTML = expectedHTML;
+        this.setupExpectedListeners();
+    },
+    
+    // Получение класса вероятности
+    getProbabilityClass(probability) {
+        if (probability >= 80) return 'high';
+        if (probability >= 50) return 'medium';
+        return 'low';
+    },
+    
+    // Настройка обработчиков для ожидаемых доходов
+    setupExpectedListeners() {
+        // Кнопка "Получен"
+        const receiveButtons = document.querySelectorAll('.expected-btn.receive');
+        receiveButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const expectedItem = e.target.closest('.expected-item');
+                const incomeId = parseInt(expectedItem.dataset.id);
+                this.markExpectedAsReceived(incomeId);
+            });
+        });
+        
+        // Кнопка "Отменить"
+        const cancelButtons = document.querySelectorAll('.expected-btn.cancel');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const expectedItem = e.target.closest('.expected-item');
+                const incomeId = parseInt(expectedItem.dataset.id);
+                this.cancelExpectedIncome(incomeId);
+            });
+        });
+        
+        // Кнопка "Удалить"
+        const deleteButtons = document.querySelectorAll('.expected-btn.delete');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const expectedItem = e.target.closest('.expected-item');
+                const incomeId = parseInt(expectedItem.dataset.id);
+                this.deleteExpectedIncome(incomeId);
+            });
+        });
+    },
+    
+    // Отметить ожидаемый доход как полученный
+    markExpectedAsReceived(incomeId) {
+        const incomeIndex = this.data.expectedIncomes.findIndex(income => income.id === incomeId);
+        if (incomeIndex === -1) return;
+        
+        const income = this.data.expectedIncomes[incomeIndex];
+        
+        // Обновляем статус
+        income.status = 'received';
+        income.receivedDate = new Date().toISOString().split('T')[0];
+        
+        // Добавляем как фактический доход
+        const newOperation = {
+            id: Date.now(),
+            type: 'income',
+            amount: income.amount,
+            description: income.description,
+            date: income.receivedDate,
+            createdAt: new Date().toISOString(),
+            source: 'expected', // Помечаем, что пришло из ожидаемых
+            originalExpectedId: incomeId
+        };
+        
+        this.data.operations.push(newOperation);
+        
+        // Сохраняем и обновляем
+        this.calculateTotals();
+        this.renderTotals();
+        this.renderOperations();
+        this.renderExpectedIncomes();
+        this.renderChart();
+        this.saveToStorage();
+        
+        this.showNotification(`Доход "${income.description}" получен и добавлен в фактические доходы`);
+    },
+    
+    // Отменить ожидаемый доход
+    cancelExpectedIncome(incomeId) {
+        const incomeIndex = this.data.expectedIncomes.findIndex(income => income.id === incomeId);
+        if (incomeIndex === -1) return;
+        
+        const income = this.data.expectedIncomes[incomeIndex];
+        
+        if (confirm(`Отменить ожидаемый доход "${income.description}"?`)) {
+            income.status = 'canceled';
+            
+            this.calculateTotals();
+            this.renderTotals();
+            this.renderExpectedIncomes();
+            this.renderChart();
+            this.saveToStorage();
+            
+            this.showNotification(`Ожидаемый доход "${income.description}" отменен`);
+        }
+    },
+    
+    // Удалить ожидаемый доход
+    deleteExpectedIncome(incomeId) {
+        const incomeIndex = this.data.expectedIncomes.findIndex(income => income.id === incomeId);
+        if (incomeIndex === -1) return;
+        
+        const income = this.data.expectedIncomes[incomeIndex];
+        
+        if (confirm(`Удалить ${income.status === 'pending' ? 'ожидаемый' : income.status} доход "${income.description}"?`)) {
+            this.data.expectedIncomes.splice(incomeIndex, 1);
+            
+            this.calculateTotals();
+            this.renderTotals();
+            this.renderExpectedIncomes();
+            this.renderChart();
+            this.saveToStorage();
+            
+            this.showNotification(`Доход "${income.description}" удален`);
+        }
+    },
+    
+    // Отображение плановых трат (обновлено с новым стилем)
     renderPlans() {
         const plansContainer = document.querySelector('.plans-content');
         if (!plansContainer) return;
@@ -579,25 +907,23 @@ const budgetApp = {
         }
     },
     
-    // Отображение списка планов
+    // Отображение списка планов (обновлено с новым стилем)
     renderPlansList(container) {
-        // Фильтруем невыполненные планы (выполненные в конце)
         const activePlans = this.data.plannedExpenses.filter(plan => !plan.completed);
         const completedPlans = this.data.plannedExpenses.filter(plan => plan.completed);
         const allPlans = [...activePlans, ...completedPlans];
         
         if (allPlans.length === 0) {
             container.innerHTML = `
-                <div class="plans-list">
-                    <div class="no-plans">Плановых трат пока нет</div>
+                <div class="list__no-data list__no-data--plans">
+                    <div class="list__no-data__description">Плановых трат пока нет</div>
+                    <div class="list__no-data__hint">Добавьте плановую трату в форме выше</div>
                 </div>
             `;
             return;
         }
         
-        let plansHTML = `
-            <div class="plans-list">
-        `;
+        let plansHTML = `<div class="plans-list">`;
         
         allPlans.forEach(plan => {
             const formattedDate = this.formatDate(plan.date);
@@ -621,7 +947,7 @@ const budgetApp = {
         this.setupPlanListeners();
     },
     
-    // Отображение формы добавления плана
+    // Отображение формы добавления плана (без изменений)
     renderPlansForm(container) {
         container.innerHTML = `
             <div class="plans-form">
@@ -653,9 +979,8 @@ const budgetApp = {
         this.setupInlinePlanListeners();
     },
     
-    // Настройка обработчиков для планов
+    // Настройка обработчиков для планов (без изменений)
     setupPlanListeners() {
-        // Чекбоксы планов
         const planCheckboxes = document.querySelectorAll('.plan-checkbox');
         planCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', (e) => {
@@ -665,7 +990,6 @@ const budgetApp = {
             });
         });
         
-        // Кнопки удаления планов
         const deleteButtons = document.querySelectorAll('.plan-delete');
         deleteButtons.forEach(button => {
             button.addEventListener('click', (e) => {
@@ -676,9 +1000,8 @@ const budgetApp = {
         });
     },
     
-    // Настройка обработчиков для встроенной формы
+    // Настройка обработчиков для встроенной формы планов (без изменений)
     setupInlinePlanListeners() {
-        // Валидация суммы при вводе
         const inlinePlanAmount = document.getElementById('inlinePlanAmount');
         if (inlinePlanAmount) {
             inlinePlanAmount.addEventListener('input', (e) => {
@@ -697,7 +1020,6 @@ const budgetApp = {
                 e.target.value = value;
             });
             
-            // Обработчик клавиши Enter
             inlinePlanAmount.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -706,7 +1028,6 @@ const budgetApp = {
             });
         }
         
-        // Обработчик клавиши Enter в описании
         const inlinePlanDescription = document.getElementById('inlinePlanDescription');
         if (inlinePlanDescription) {
             inlinePlanDescription.addEventListener('keypress', (e) => {
@@ -717,13 +1038,11 @@ const budgetApp = {
             });
         }
         
-        // Обработчик для поля даты
         const inlinePlanDate = document.querySelector('.date-input-inline');
         if (inlinePlanDate) {
             inlinePlanDate.addEventListener('click', () => this.openInlinePlanCalendar());
         }
         
-        // Обработчик кнопки отмены
         const inlinePlanCancel = document.getElementById('inlinePlanCancel');
         if (inlinePlanCancel) {
             inlinePlanCancel.addEventListener('click', (e) => {
@@ -732,7 +1051,6 @@ const budgetApp = {
             });
         }
         
-        // Обработчик кнопки сохранения
         const inlinePlanSave = document.getElementById('inlinePlanSave');
         if (inlinePlanSave) {
             inlinePlanSave.addEventListener('click', (e) => {
@@ -742,7 +1060,7 @@ const budgetApp = {
         }
     },
     
-    // Переключение состояния плана (выполнено/не выполнено)
+    // Переключение состояния плана (без изменений)
     togglePlanComplete(planId) {
         const planIndex = this.data.plannedExpenses.findIndex(plan => plan.id === planId);
         if (planIndex !== -1) {
@@ -751,14 +1069,13 @@ const budgetApp = {
             this.saveToStorage();
             this.renderPlans();
             
-            // Показываем уведомление
             const plan = this.data.plannedExpenses[planIndex];
             const status = isCompleted ? 'выполнена' : 'не выполнена';
             this.showNotification(`Плановая трата "${plan.description}" отмечена как ${status}`);
         }
     },
     
-    // Удаление плана
+    // Удаление плана (без изменений)
     deletePlan(planId) {
         const planIndex = this.data.plannedExpenses.findIndex(plan => plan.id === planId);
         if (planIndex === -1) return;
@@ -774,28 +1091,24 @@ const budgetApp = {
         }
     },
     
-    // Переключение на вкладку списка
+    // Переключение на вкладку списка планов (без изменений)
     switchToPlansList() {
         const listTab = document.querySelector('.plans .categories__item[data-action="show-list"]');
         if (listTab) {
-            // Убираем активный класс у всех
             document.querySelectorAll('.plans .categories__item').forEach(item => {
                 item.classList.remove('active');
             });
-            // Добавляем активный класс вкладке "Список"
             listTab.classList.add('active');
-            // Перерисовываем планы
             this.renderPlans();
         }
     },
     
-    // Добавление плана через встроенную форму
+    // Добавление плана через встроенную форму (без изменений)
     addInlinePlan() {
         const inlinePlanAmount = document.getElementById('inlinePlanAmount');
         const inlinePlanDescription = document.getElementById('inlinePlanDescription');
         const realInlinePlanDate = document.getElementById('realInlinePlanDate');
         
-        // Валидация
         const amount = parseFloat(inlinePlanAmount.value.replace(',', '.'));
         const description = inlinePlanDescription.value.trim();
         const date = realInlinePlanDate.value;
@@ -818,7 +1131,6 @@ const budgetApp = {
             return;
         }
         
-        // Создаем новый план
         const newPlan = {
             id: Date.now(),
             amount: parseFloat(amount.toFixed(2)),
@@ -828,13 +1140,9 @@ const budgetApp = {
             createdAt: new Date().toISOString()
         };
         
-        // Добавляем в данные
         this.data.plannedExpenses.push(newPlan);
-        
-        // Сохраняем в localStorage
         this.saveToStorage();
         
-        // Очищаем форму
         inlinePlanAmount.value = '';
         inlinePlanDescription.value = '';
         
@@ -846,13 +1154,8 @@ const budgetApp = {
             realInlinePlanDate.value = '';
         }
         
-        // Переключаемся на вкладку списка
         this.switchToPlansList();
-        
-        // Показываем уведомление
         this.showNotification(`Плановая трата "${description}" успешно добавлена`);
-        
-        console.log('Добавлена новая плановая трата:', newPlan);
     },
     
     // Инициализация графика
@@ -860,23 +1163,27 @@ const budgetApp = {
         this.renderChart();
     },
     
-    // Получение данных для графика
+    // Получение данных для графика (обновлено для прогноза)
     getChartData() {
         const activeTab = document.querySelector('.chart .categories__item.active');
         const chartType = activeTab ? activeTab.dataset.chartType : 'monthly';
         
         if (chartType === 'monthly') {
             return this.getMonthlyData();
-        } else {
+        } else if (chartType === 'categories') {
             return this.getCategoryData();
+        } else if (chartType === 'forecast') {
+            return this.getForecastData();
         }
+        
+        return this.getMonthlyData();
     },
     
-    // Получение данных по месяцам
+    // Получение данных по месяцам (обновлено для ожидаемых доходов)
     getMonthlyData() {
-        // Группируем операции по месяцам
         const monthlyData = {};
         
+        // Обрабатываем фактические операции
         this.data.operations.forEach(operation => {
             const date = new Date(operation.date);
             const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
@@ -889,7 +1196,8 @@ const budgetApp = {
                 monthlyData[monthKey] = {
                     month: monthName,
                     income: 0,
-                    expense: 0
+                    expense: 0,
+                    expected: 0
                 };
             }
             
@@ -900,10 +1208,40 @@ const budgetApp = {
             }
         });
         
+        // Добавляем ожидаемые доходы (для текущего и будущих месяцев)
+        const currentDate = new Date();
+        const currentMonth = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+        
+        this.data.expectedIncomes.forEach(income => {
+            if (income.status === 'pending') {
+                const date = new Date(income.date);
+                const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                // Показываем ожидаемые только для текущего и будущих месяцев
+                if (monthKey >= currentMonth) {
+                    if (!monthlyData[monthKey]) {
+                        const monthName = date.toLocaleDateString('ru-RU', { 
+                            month: 'short',
+                            year: '2-digit'
+                        });
+                        monthlyData[monthKey] = {
+                            month: monthName,
+                            income: 0,
+                            expense: 0,
+                            expected: 0
+                        };
+                    }
+                    
+                    monthlyData[monthKey].expected += income.amount;
+                }
+            }
+        });
+        
         // Преобразуем в массивы для графика
         const months = [];
         const incomes = [];
         const expenses = [];
+        const expected = [];
         
         // Сортируем по месяцам
         Object.keys(monthlyData)
@@ -913,12 +1251,14 @@ const budgetApp = {
                 months.push(data.month);
                 incomes.push(data.income);
                 expenses.push(data.expense);
+                expected.push(data.expected);
             });
         
-        // Берем последние 6 месяцев или все, если меньше
+        // Берем последние 6 месяцев
         const lastMonths = months.slice(-6);
         const lastIncomes = incomes.slice(-6);
         const lastExpenses = expenses.slice(-6);
+        const lastExpected = expected.slice(-6);
         
         // Если данных нет, показываем пустой график
         if (lastMonths.length === 0) {
@@ -967,14 +1307,23 @@ const budgetApp = {
                     borderWidth: 2,
                     borderRadius: 4,
                     barPercentage: 0.6
+                },
+                {
+                    label: 'Ожидаемые',
+                    data: lastExpected,
+                    backgroundColor: CHART_COLORS.expected,
+                    borderColor: CHART_COLORS.expected,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    hidden: lastExpected.every(val => val === 0) // Скрываем если все нули
                 }
             ]
         };
     },
     
-    // Получение данных по категориям
+    // Получение данных по категориям (без изменений)
     getCategoryData() {
-        // Группируем по описаниям (категориям)
         const categoryData = {};
         
         this.data.operations.forEach(operation => {
@@ -998,7 +1347,6 @@ const budgetApp = {
             categoryData[category].total = categoryData[category].income + categoryData[category].expense;
         });
         
-        // Преобразуем в массив и сортируем по общей сумме
         const categories = Object.entries(categoryData)
             .map(([name, data]) => ({
                 name,
@@ -1006,9 +1354,8 @@ const budgetApp = {
                 color: data.income > data.expense ? CHART_COLORS.income : CHART_COLORS.expense
             }))
             .sort((a, b) => b.total - a.total)
-            .slice(0, 8); // Берем топ-8 категорий
+            .slice(0, 8);
         
-        // Если данных нет, показываем пустой график
         if (categories.length === 0) {
             return {
                 labels: ['Нет данных'],
@@ -1043,7 +1390,133 @@ const budgetApp = {
         };
     },
     
-    // Рендеринг графика
+    // Получение данных для прогноза
+    getForecastData() {
+        // Собираем данные по месяцам (фактические + ожидаемые)
+        const forecastData = {};
+        const currentDate = new Date();
+        
+        // Добавляем фактические данные за последние 3 месяца
+        for (let i = 2; i >= 0; i--) {
+            const date = new Date(currentDate.getFullYear(), currentDate.getMonth() - i, 1);
+            const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            const monthName = date.toLocaleDateString('ru-RU', { 
+                month: 'short',
+                year: '2-digit'
+            });
+            
+            forecastData[monthKey] = {
+                month: monthName,
+                actual: 0,
+                forecast: 0
+            };
+        }
+        
+        // Добавляем фактические доходы
+        this.data.operations.forEach(operation => {
+            if (operation.type === 'income') {
+                const date = new Date(operation.date);
+                const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                if (forecastData[monthKey]) {
+                    forecastData[monthKey].actual += operation.amount;
+                }
+            }
+        });
+        
+        // Добавляем прогноз на текущий месяц (фактические + ожидаемые)
+        const currentMonthKey = `${currentDate.getFullYear()}-${(currentDate.getMonth() + 1).toString().padStart(2, '0')}`;
+        if (forecastData[currentMonthKey]) {
+            forecastData[currentMonthKey].forecast = forecastData[currentMonthKey].actual;
+            
+            // Добавляем ожидаемые доходы для текущего месяца
+            this.data.expectedIncomes.forEach(income => {
+                if (income.status === 'pending') {
+                    const date = new Date(income.date);
+                    const incomeMonthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                    
+                    if (incomeMonthKey === currentMonthKey) {
+                        forecastData[currentMonthKey].forecast += income.amount * (income.probability / 100);
+                    }
+                }
+            });
+        }
+        
+        // Прогноз на следующий месяц (среднее + ожидаемые)
+        const nextMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1);
+        const nextMonthKey = `${nextMonth.getFullYear()}-${(nextMonth.getMonth() + 1).toString().padStart(2, '0')}`;
+        const nextMonthName = nextMonth.toLocaleDateString('ru-RU', { 
+            month: 'short',
+            year: '2-digit'
+        });
+        
+        // Рассчитываем средний доход за последние 3 месяца
+        let totalActual = 0;
+        let monthCount = 0;
+        Object.values(forecastData).forEach(data => {
+            totalActual += data.actual;
+            monthCount++;
+        });
+        const averageIncome = monthCount > 0 ? totalActual / monthCount : 0;
+        
+        forecastData[nextMonthKey] = {
+            month: nextMonthName,
+            actual: 0,
+            forecast: averageIncome
+        };
+        
+        // Добавляем ожидаемые доходы на следующий месяц
+        this.data.expectedIncomes.forEach(income => {
+            if (income.status === 'pending') {
+                const date = new Date(income.date);
+                const incomeMonthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+                
+                if (incomeMonthKey === nextMonthKey) {
+                    forecastData[nextMonthKey].forecast += income.amount * (income.probability / 100);
+                }
+            }
+        });
+        
+        // Преобразуем в массивы
+        const months = [];
+        const actuals = [];
+        const forecasts = [];
+        
+        Object.keys(forecastData)
+            .sort()
+            .forEach(key => {
+                const data = forecastData[key];
+                months.push(data.month);
+                actuals.push(data.actual);
+                forecasts.push(data.forecast);
+            });
+        
+        return {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Фактические доходы',
+                    data: actuals,
+                    backgroundColor: CHART_COLORS.income + '80',
+                    borderColor: CHART_COLORS.income,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                },
+                {
+                    label: 'Прогноз доходов',
+                    data: forecasts,
+                    backgroundColor: CHART_COLORS.expected + '80',
+                    borderColor: CHART_COLORS.expected,
+                    borderWidth: 2,
+                    borderRadius: 4,
+                    barPercentage: 0.6
+                }
+            ]
+        };
+    },
+    
+    // Рендеринг графика (обновлено)
     renderChart() {
         const canvas = document.getElementById('budgetChart');
         if (!canvas) return;
@@ -1051,7 +1524,6 @@ const budgetApp = {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
         
-        // Очищаем предыдущий график
         if (this.chart) {
             this.chart.destroy();
         }
@@ -1060,10 +1532,9 @@ const budgetApp = {
         const activeTab = document.querySelector('.chart .categories__item.active');
         const chartType = activeTab ? activeTab.dataset.chartType : 'monthly';
         
-        // Определяем тип графика
         const isMonthlyChart = chartType === 'monthly';
+        const isForecastChart = chartType === 'forecast';
         
-        // Создаем новый график
         this.chart = new Chart(ctx, {
             type: 'bar',
             data: chartData,
@@ -1072,7 +1543,7 @@ const budgetApp = {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        display: isMonthlyChart,
+                        display: isMonthlyChart || isForecastChart,
                         position: 'top',
                         labels: {
                             color: CHART_COLORS.text,
@@ -1122,7 +1593,7 @@ const budgetApp = {
                                 family: "'Inter', sans-serif",
                                 size: 11
                             },
-                            maxRotation: isMonthlyChart ? 0 : 45
+                            maxRotation: isMonthlyChart || isForecastChart ? 0 : 45
                         }
                     },
                     y: {
@@ -1157,19 +1628,19 @@ const budgetApp = {
             }
         });
         
-        // Обновляем статистику
         this.updateChartStats();
     },
     
-    // Обновление статистики под графиком
+    // Обновление статистики под графиком (обновлено)
     updateChartStats() {
-        if (this.data.operations.length === 0) {
+        if (this.data.operations.length === 0 && this.data.expectedIncomes.length === 0) {
             this.updateEmptyStats();
             return;
         }
         
         const incomeElements = this.data.operations.filter(op => op.type === 'income');
         const expenseElements = this.data.operations.filter(op => op.type === 'expense');
+        const expectedElements = this.data.expectedIncomes.filter(inc => inc.status === 'pending');
         
         // Средний доход
         const avgIncome = incomeElements.length > 0 
@@ -1181,6 +1652,11 @@ const budgetApp = {
             ? expenseElements.reduce((sum, op) => sum + op.amount, 0) / expenseElements.length
             : 0;
         
+        // Средний ожидаемый доход (с учетом вероятности)
+        const avgExpected = expectedElements.length > 0
+            ? expectedElements.reduce((sum, inc) => sum + (inc.amount * inc.probability / 100), 0) / expectedElements.length
+            : 0;
+        
         // Общий баланс
         const totalBalance = this.data.balance || 0;
         
@@ -1188,6 +1664,7 @@ const budgetApp = {
         const avgIncomeElement = document.querySelector('.chart-stat__value.income');
         const avgExpenseElement = document.querySelector('.chart-stat__value.expense');
         const totalBalanceElement = document.querySelector('.chart-stat__value.balance');
+        const avgExpectedElement = document.querySelector('.chart-stat__value.expected');
         
         if (avgIncomeElement) {
             avgIncomeElement.textContent = `${this.formatCurrency(avgIncome)} Р`;
@@ -1195,6 +1672,10 @@ const budgetApp = {
         
         if (avgExpenseElement) {
             avgExpenseElement.textContent = `${this.formatCurrency(avgExpense)} Р`;
+        }
+        
+        if (avgExpectedElement) {
+            avgExpectedElement.textContent = `${this.formatCurrency(avgExpected)} Р`;
         }
         
         if (totalBalanceElement) {
@@ -1210,62 +1691,58 @@ const budgetApp = {
         const avgIncomeElement = document.querySelector('.chart-stat__value.income');
         const avgExpenseElement = document.querySelector('.chart-stat__value.expense');
         const totalBalanceElement = document.querySelector('.chart-stat__value.balance');
+        const avgExpectedElement = document.querySelector('.chart-stat__value.expected');
         
         if (avgIncomeElement) avgIncomeElement.textContent = '0,00 Р';
         if (avgExpenseElement) avgExpenseElement.textContent = '0,00 Р';
+        if (avgExpectedElement) avgExpectedElement.textContent = '0,00 Р';
         if (totalBalanceElement) {
             totalBalanceElement.textContent = '0,00 Р';
             totalBalanceElement.style.color = '#FFFFFF';
         }
     },
     
-    // Инициализация календаря
+    // Инициализация календаря (без изменений)
     initCalendar() {
         this.currentSelectedDate = new Date();
         this.renderCalendar();
     },
     
-    // Открытие календаря
+    // Открытие календаря (без изменений)
     openCalendar() {
         const calendarModal = document.getElementById('calendarModal');
         if (calendarModal) {
             calendarModal.classList.add('active');
-            // Обновляем календарь на текущий месяц
             this.currentSelectedDate = new Date();
             this.renderCalendar();
-            // Блокируем скролл страницы
             document.body.style.overflow = 'hidden';
         }
     },
     
-    // Открытие календаря для встроенной формы
+    // Открытие календаря для встроенной формы (без изменений)
     openInlinePlanCalendar() {
         const inlinePlanDate = document.getElementById('inlinePlanDate');
         const realInlinePlanDate = document.getElementById('realInlinePlanDate');
         
-        // Сохраняем ссылки на элементы
         this.currentPlanDateInput = inlinePlanDate;
         this.currentRealPlanDateInput = realInlinePlanDate;
         
-        // Открываем календарь
         this.openCalendar();
     },
     
-    // Закрытие календаря
+    // Закрытие календаря (без изменений)
     closeCalendar() {
         const calendarModal = document.getElementById('calendarModal');
         if (calendarModal) {
             calendarModal.classList.remove('active');
-            // Разблокируем скролл страницы
             document.body.style.overflow = '';
             
-            // Очищаем ссылки на элементы формы
             this.currentPlanDateInput = null;
             this.currentRealPlanDateInput = null;
         }
     },
     
-    // Рендеринг календаря
+    // Рендеринг календаря (без изменений)
     renderCalendar() {
         const calendarDays = document.getElementById('calendarDays');
         const calendarTitle = document.getElementById('calendarTitle');
@@ -1275,17 +1752,14 @@ const budgetApp = {
         const year = this.currentSelectedDate.getFullYear();
         const month = this.currentSelectedDate.getMonth();
         
-        // Устанавливаем заголовок
         const monthNames = [
             'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
             'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
         ];
         calendarTitle.textContent = `${monthNames[month]} ${year}`;
         
-        // Очищаем дни
         calendarDays.innerHTML = '';
         
-        // Добавляем названия дней недели
         const dayNames = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
         dayNames.forEach(day => {
             const dayElement = document.createElement('div');
@@ -1294,16 +1768,12 @@ const budgetApp = {
             calendarDays.appendChild(dayElement);
         });
         
-        // Получаем первый день месяца
         const firstDay = new Date(year, month, 1);
-        // Получаем последний день месяца
         const lastDay = new Date(year, month + 1, 0);
-        // Начинаем с понедельника
         let startDay = firstDay.getDay();
-        if (startDay === 0) startDay = 7; // Воскресенье становится 7
-        startDay -= 1; // Приводим к 0-6, где 0 - понедельник
+        if (startDay === 0) startDay = 7;
+        startDay -= 1;
         
-        // Добавляем пустые дни для начала месяца
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startDay - 1; i >= 0; i--) {
             const dayElement = document.createElement('div');
@@ -1312,11 +1782,9 @@ const budgetApp = {
             calendarDays.appendChild(dayElement);
         }
         
-        // Добавляем дни месяца
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         
-        // Определяем, для какой формы проверяем выбранную дату
         let currentDateValue = null;
         if (this.currentPlanDateInput && this.currentRealPlanDateInput) {
             currentDateValue = this.currentRealPlanDateInput.value;
@@ -1336,12 +1804,10 @@ const budgetApp = {
             dayElement.setAttribute('role', 'button');
             dayElement.setAttribute('tabindex', '0');
             
-            // Проверяем, сегодня ли это
             if (dayDate.getTime() === today.getTime()) {
                 dayElement.classList.add('today');
             }
             
-            // Проверяем, выбрана ли эта дата
             if (currentDateValue) {
                 const selectedDate = new Date(currentDateValue);
                 selectedDate.setHours(0, 0, 0, 0);
@@ -1351,10 +1817,8 @@ const budgetApp = {
                 }
             }
             
-            // Обработчик клика
             dayElement.addEventListener('click', () => this.selectDate(dayDate));
             
-            // Обработчик клавиши Enter
             dayElement.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter') {
                     this.selectDate(dayDate);
@@ -1365,7 +1829,7 @@ const budgetApp = {
         }
     },
     
-    // Выбор даты
+    // Выбор даты (без изменений)
     selectDate(date) {
         const formattedDate = date.toLocaleDateString('ru-RU', {
             day: '2-digit',
@@ -1373,13 +1837,10 @@ const budgetApp = {
             year: 'numeric'
         });
         
-        // Проверяем, для какой формы выбираем дату
         if (this.currentPlanDateInput && this.currentRealPlanDateInput) {
-            // Для встроенной формы плана
             this.currentPlanDateInput.value = formattedDate;
             this.currentRealPlanDateInput.value = date.toISOString().split('T')[0];
         } else {
-            // Для основной формы
             const dateInput = document.getElementById('dateInput');
             const realDateInput = document.getElementById('realDateInput');
             
@@ -1391,11 +1852,10 @@ const budgetApp = {
             }
         }
         
-        // Закрываем календарь
         this.closeCalendar();
     },
     
-    // Переключение месяца
+    // Переключение месяца (без изменений)
     changeMonth(direction) {
         const newDate = new Date(this.currentSelectedDate);
         newDate.setMonth(newDate.getMonth() + direction);
@@ -1403,7 +1863,7 @@ const budgetApp = {
         this.renderCalendar();
     },
     
-    // Установить сегодняшнюю дату
+    // Установить сегодняшнюю дату (без изменений)
     setToday() {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -1412,9 +1872,8 @@ const budgetApp = {
         this.renderCalendar();
     },
     
-    // Очистить дату
+    // Очистить дату (без изменений)
     clearDate() {
-        // Определяем, для какой формы очищаем
         if (this.currentPlanDateInput && this.currentRealPlanDateInput) {
             this.currentPlanDateInput.value = '';
             this.currentRealPlanDateInput.value = '';
@@ -1438,15 +1897,16 @@ const budgetApp = {
 document.addEventListener('DOMContentLoaded', () => {
     budgetApp.init();
     
-    // Загружаем данные из localStorage при загрузке
     window.addEventListener('storage', (e) => {
-        if (e.key === 'budgetOperations' || e.key === 'budgetPlannedExpenses') {
+        if (e.key === 'budgetOperations' || e.key === 'budgetPlannedExpenses' || e.key === 'budgetExpectedIncomes') {
             budgetApp.data.operations = JSON.parse(localStorage.getItem('budgetOperations')) || [];
             budgetApp.data.plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses')) || [];
+            budgetApp.data.expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes')) || [];
             budgetApp.calculateTotals();
             budgetApp.renderTotals();
             budgetApp.renderOperations();
             budgetApp.renderPlans();
+            budgetApp.renderExpectedIncomes();
             budgetApp.renderChart();
         }
     });

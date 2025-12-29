@@ -58,7 +58,7 @@ input:focus {
     background-color: #2A2A2A;
     padding: 32px 16px;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     grid-template-rows: auto 1fr;
     column-gap: 16px;
     row-gap: 32px;
@@ -68,7 +68,7 @@ input:focus {
 }
 
 .header__logo {
-    grid-column: span 3;
+    grid-column: span 4;
     font-size: 32px;
     line-height: 1;
     text-transform: uppercase;
@@ -227,7 +227,7 @@ input:focus {
 
 .chart-stats {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 12px;
     margin-top: 20px;
 }
@@ -380,19 +380,64 @@ input:focus {
     box-shadow: 0 2px 8px rgba(255, 118, 83, 0.3);
 }
 
-/* Список операций */
-.list__no-history {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+/* Стили для пустых состояний */
+.list__no-data {
     text-align: center;
     color: #8A8A8A;
     font-size: 16px;
-    width: 100%;
-    padding: 0 24px;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 200px;
 }
 
+.list__no-data::before {
+    content: '';
+    width: 64px;
+    height: 64px;
+    background-color: #3B3B3B;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: #8A8A8A;
+    margin-bottom: 8px;
+    opacity: 0.7;
+}
+
+.list__no-data--history::before {
+    content: '📊';
+}
+
+.list__no-data--plans::before {
+    content: '📅';
+}
+
+.list__no-data--expected::before {
+    content: '💰';
+}
+
+.list__no-data__description {
+    font-size: 14px;
+    color: #8A8A8A;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.list__no-data__hint {
+    font-size: 13px;
+    color: #8A8A8A;
+    background: rgba(138, 138, 138, 0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+/* Список операций */
 .operation {
     display: flex;
     align-items: center;
@@ -580,13 +625,6 @@ input:focus {
 .plan-delete:hover {
     color: #FF7653;
     background: rgba(255, 118, 83, 0.1);
-}
-
-.no-plans {
-    text-align: center;
-    color: #8A8A8A;
-    font-size: 16px;
-    padding: 40px 0;
 }
 
 /* Форма добавления плана */
@@ -918,7 +956,318 @@ input:focus {
     text-align: right;
 }
 
-/* Адаптивность для 3 элементов в шапке */
+/* Новый цвет для ожидаемых доходов */
+.expected {
+    color: #FFB74D; /* Оранжевый для ожидаемых */
+}
+
+.header__item.header__expected .header__sum {
+    color: #FFB74D;
+}
+
+.legend-color.expected {
+    background-color: #FFB74D;
+}
+
+.chart-stat__value.expected {
+    color: #FFB74D;
+}
+
+/* Слайдер вероятности */
+.probability-slider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+}
+
+.probability-input {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #272727;
+    border-radius: 3px;
+    outline: none;
+    padding: 0;
+    margin: 0;
+}
+
+.probability-input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FF7653;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.probability-input::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FF7653;
+    cursor: pointer;
+    border: 2px solid #FFFFFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.probability-value {
+    min-width: 50px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 16px;
+    color: #FFB74D;
+}
+
+/* Стили для ожидаемых доходов в списке */
+.expected-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #272727;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    border-left: 4px solid #FFB74D;
+}
+
+.expected-item:hover {
+    background: #333333;
+    transform: translateX(4px);
+}
+
+.expected-item.received {
+    opacity: 0.7;
+    border-left-color: #4CAF50;
+}
+
+.expected-item.canceled {
+    opacity: 0.5;
+    border-left-color: #8A8A8A;
+}
+
+.expected-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.expected-description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.2;
+    color: #FFFFFF;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.expected-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 13px;
+    color: #8A8A8A;
+}
+
+.expected-client {
+    background: rgba(255, 183, 77, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #FFB74D;
+}
+
+.expected-category {
+    background: rgba(76, 175, 80, 0.1);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #4CAF50;
+}
+
+.expected-probability {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.probability-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.probability-indicator.high {
+    background-color: #4CAF50;
+}
+
+.probability-indicator.medium {
+    background-color: #FFB74D;
+}
+
+.probability-indicator.low {
+    background-color: #FF7653;
+}
+
+.expected-amount {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    color: #FFB74D;
+    margin-right: 40px;
+}
+
+.expected-actions {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    gap: 8px;
+}
+
+.expected-btn {
+    background: none;
+    border: none;
+    color: #8A8A8A;
+    font-size: 20px;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+}
+
+.expected-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.expected-btn.receive:hover {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.1);
+}
+
+.expected-btn.cancel:hover {
+    color: #FF7653;
+    background: rgba(255, 118, 83, 0.1);
+}
+
+.expected-btn.delete:hover {
+    color: #F44336;
+    background: rgba(244, 67, 54, 0.1);
+}
+
+/* Индикаторы статуса в шапке */
+.header__expected .header__sum {
+    position: relative;
+}
+
+.expected-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2A2A2A;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #8A8A8A;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 10;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.header__expected:hover .expected-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Форма с select */
+.form-label {
+    display: block;
+    font-size: 14px;
+    color: #8A8A8A;
+    margin-bottom: 8px;
+}
+
+.add__input[type="range"] {
+    padding: 0;
+}
+
+.add__input select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    background-size: 20px;
+    padding-right: 50px;
+    cursor: pointer;
+    width: 100%;
+}
+
+.add__input select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23FF7653' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    border-color: #FF7653;
+    outline: none;
+}
+
+.add__input select option {
+    background-color: #272727;
+    color: #FFFFFF;
+    padding: 10px;
+}
+
+.add__input select option:hover {
+    background-color: #FF7653;
+}
+
+/* Плавная прокрутка */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* =========================================== */
+/* Адаптивность для 4 элементов в шапке */
+/* =========================================== */
+
+/* Для планшетов (768px и меньше) */
 @media (max-width: 768px) {
     .header {
         grid-template-columns: repeat(2, 1fr);
@@ -931,53 +1280,74 @@ input:focus {
     }
     
     .header__income,
-    .header__expenses {
+    .header__expenses,
+    .header__balance,
+    .header__expected {
         grid-column: span 1;
-    }
-    
-    .header__balance {
-        grid-column: span 2;
-        width: calc(50% - 8px);
-        margin: 0 auto;
     }
     
     .chart-stats {
         grid-template-columns: repeat(2, 1fr);
     }
     
-    .chart-stat:last-child {
-        grid-column: span 2;
+    .chart-stat:nth-child(3),
+    .chart-stat:nth-child(4) {
+        grid-column: span 1;
     }
     
     .chart-container {
         height: 180px;
     }
+    
+    /* Остальные стили для 768px */
+    .add, .list {
+        padding: 24px 20px;
+        margin-bottom: 28px;
+    }
+    
+    .control-panel {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+    }
+    
+    .control-panel__categories {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .categories__item {
+        flex: 1;
+        text-align: center;
+        padding: 12px 16px;
+        font-size: 13px;
+    }
 }
 
+/* Для мобильных (560px и меньше) */
 @media (max-width: 560px) {
     .header {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto repeat(3, auto);
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto repeat(2, auto);
         row-gap: 16px;
+        padding: 24px 16px;
     }
     
     .header__logo {
-        grid-column: span 1;
-        text-align: center;
+        grid-column: span 2;
         font-size: 28px;
     }
     
-    .header__item {
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected {
         grid-column: span 1;
-        padding: 20px 16px;
+        padding: 20px 12px;
     }
     
     .header__sum {
-        font-size: 22px;
-    }
-    
-    .header__balance {
-        width: 100%;
+        font-size: 20px;
     }
     
     .add, .list {
@@ -1013,24 +1383,6 @@ input:focus {
         text-align: center;
     }
     
-    .control-panel {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 20px;
-    }
-    
-    .control-panel__categories {
-        justify-content: center;
-        width: 100%;
-    }
-    
-    .categories__item {
-        flex: 1;
-        text-align: center;
-        padding: 12px 16px;
-        font-size: 13px;
-    }
-    
     .operation {
         flex-direction: column;
         align-items: flex-start;
@@ -1064,6 +1416,30 @@ input:focus {
         margin-left: auto;
     }
     
+    .expected-item {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    
+    .expected-amount {
+        margin-right: 0;
+        order: 3;
+        width: 100%;
+        text-align: right;
+    }
+    
+    .expected-actions {
+        position: static;
+        order: 4;
+        transform: none;
+        margin-left: auto;
+    }
+    
+    .expected-details {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
     .form-actions {
         flex-direction: column;
     }
@@ -1082,25 +1458,52 @@ input:focus {
     }
     
     .chart-stats {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
     }
     
-    .chart-stat:last-child {
-        grid-column: span 1;
+    .chart-stat {
+        padding: 14px 12px;
+    }
+    
+    .chart-stat__label {
+        font-size: 11px;
+    }
+    
+    .chart-stat__value {
+        font-size: 16px;
     }
     
     .chart-container {
         height: 160px;
     }
     
-    .chart-stat__value {
-        font-size: 16px;
+    .list__no-data {
+        padding: 40px 20px;
+    }
+    
+    .list__no-data::before {
+        width: 48px;
+        height: 48px;
+        font-size: 24px;
     }
 }
 
+/* Для маленьких мобильных (400px и меньше) */
 @media (max-width: 400px) {
+    .header {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto repeat(4, auto);
+    }
+    
     .header__logo {
         font-size: 24px;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected {
+        padding: 16px 12px;
     }
     
     .header__sum {
@@ -1112,13 +1515,19 @@ input:focus {
     }
     
     .operation__description,
-    .plan-description {
+    .plan-description,
+    .expected-description {
         font-size: 15px;
     }
     
     .operation__amount,
-    .plan-amount {
+    .plan-amount,
+    .expected-amount {
         font-size: 15px;
+    }
+    
+    .chart-stats {
+        grid-template-columns: 1fr;
     }
     
     .calendar-grid {
@@ -1134,32 +1543,61 @@ input:focus {
         font-size: 12px;
         padding: 8px 0;
     }
+    
+    .list__no-data {
+        padding: 30px 16px;
+    }
+    
+    .list__no-data::before {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    
+    .list__no-data__description {
+        font-size: 13px;
+    }
+    
+    .list__no-data__hint {
+        font-size: 12px;
+        padding: 6px 12px;
+    }
 }
 
-/* Плавная прокрутка */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Анимации */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+/* Для очень маленьких экранов (360px и меньше) */
+@media (max-width: 360px) {
+    .header__item {
+        padding: 14px 10px;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    .header__sum {
+        font-size: 16px;
     }
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(-20px);
-        opacity: 0;
+    
+    .categories__item {
+        padding: 10px 12px;
+        font-size: 12px;
     }
-    to {
-        transform: translateX(0);
-        opacity: 1;
+    
+    .add__input {
+        padding: 14px 16px;
+        font-size: 14px;
+    }
+    
+    .add__btn {
+        padding: 14px;
+        font-size: 15px;
+    }
+    
+    .chart-stat {
+        padding: 12px 10px;
+    }
+    
+    .chart-stat__label {
+        font-size: 10px;
+    }
+    
+    .chart-stat__value {
+        font-size: 14px;
     }
 }
