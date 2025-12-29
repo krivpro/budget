@@ -593,7 +593,7 @@ const budgetApp = {
         }
     },
     
-    // Отображение списка операций (без изменений, оставляем как есть)
+    // Отображение списка операций (обновлено с новым стилем)
     renderOperations() {
         const operationsContainer = document.querySelector('.history');
         if (!operationsContainer) return;
@@ -617,22 +617,6 @@ const budgetApp = {
         filteredOperations.sort((a, b) => new Date(b.date) - new Date(a.date));
         
         // Создаем HTML для операций
-        if (filteredOperations.length === 0) {
-            operationsContainer.innerHTML = `
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Список операций</h2>
-                    <div class="control-panel__categories categories">
-                        <div class="categories__item active">Все</div>
-                        <div class="categories__item">Доходы</div>
-                        <div class="categories__item">Расходы</div>
-                    </div>
-                </div>
-                <div class="list__no-history">Операций пока нет</div>
-            `;
-            this.setupFilterListeners();
-            return;
-        }
-        
         let operationsHTML = `
             <div class="control-panel">
                 <h2 class="control-panel__title">Список операций</h2>
@@ -644,21 +628,44 @@ const budgetApp = {
             </div>
         `;
         
-        filteredOperations.forEach(operation => {
-            const formattedDate = this.formatDate(operation.date);
-            const amountClass = operation.type === 'income' ? 'operation__amount--income' : 'operation__amount--expense';
-            const amountSign = operation.type === 'income' ? '+' : '-';
-            
+        if (filteredOperations.length === 0) {
             operationsHTML += `
-                <div class="operation" data-id="${operation.id}">
-                    <div class="operation__info">
-                        <p class="operation__description">${operation.description}</p>
-                        <p class="operation__date">${formattedDate}</p>
+                <div class="list__no-data list__no-data--history">
+                    <div class="list__no-data__description">
+                        ${this.data.operations.length === 0 
+                            ? 'Операций пока нет' 
+                            : filterType === 'all' 
+                                ? 'Нет операций' 
+                                : filterType === 'income' 
+                                    ? 'Нет доходов' 
+                                    : 'Нет расходов'}
                     </div>
-                    <p class="operation__amount ${amountClass}">${amountSign}${this.formatCurrency(operation.amount)} Р</p>
+                    <div class="list__no-data__hint">
+                        ${this.data.operations.length === 0 
+                            ? 'Добавьте первую операцию в форме выше' 
+                            : filterType === 'income' 
+                                ? 'Переключитесь на "Все" или "Расходы"' 
+                                : 'Переключитесь на "Все" или "Доходы"'}
+                    </div>
                 </div>
             `;
-        });
+        } else {
+            filteredOperations.forEach(operation => {
+                const formattedDate = this.formatDate(operation.date);
+                const amountClass = operation.type === 'income' ? 'operation__amount--income' : 'operation__amount--expense';
+                const amountSign = operation.type === 'income' ? '+' : '-';
+                
+                operationsHTML += `
+                    <div class="operation" data-id="${operation.id}">
+                        <div class="operation__info">
+                            <p class="operation__description">${operation.description}</p>
+                            <p class="operation__date">${formattedDate}</p>
+                        </div>
+                        <p class="operation__amount ${amountClass}">${amountSign}${this.formatCurrency(operation.amount)} Р</p>
+                    </div>
+                `;
+            });
+        }
         
         operationsContainer.innerHTML = operationsHTML;
         this.setupFilterListeners();
@@ -689,7 +696,7 @@ const budgetApp = {
         });
     },
     
-    // Отображение ожидаемых доходов
+    // Отображение ожидаемых доходов (обновлено с новым стилем)
     renderExpectedIncomes() {
         const expectedContainer = document.querySelector('.expected-content');
         if (!expectedContainer) return;
@@ -709,12 +716,24 @@ const budgetApp = {
         
         if (filteredIncomes.length === 0) {
             let message = 'Ожидаемых доходов пока нет';
-            if (statusFilter === 'pending') message = 'Нет ожидаемых доходов';
-            else if (statusFilter === 'received') message = 'Нет полученных ожидаемых доходов';
-            else if (statusFilter === 'canceled') message = 'Нет отмененных ожидаемых доходов';
+            let hint = 'Добавьте ожидаемый доход в форме выше';
+            
+            if (statusFilter === 'pending') {
+                message = 'Нет ожидаемых доходов';
+                hint = 'Все доходы получены или отменены';
+            } else if (statusFilter === 'received') {
+                message = 'Нет полученных ожидаемых доходов';
+                hint = 'Пока нет доходов, отмеченных как полученные';
+            } else if (statusFilter === 'canceled') {
+                message = 'Нет отмененных ожидаемых доходов';
+                hint = 'Пока нет отмененных ожидаемых доходов';
+            }
             
             expectedContainer.innerHTML = `
-                <div class="no-expected">${message}</div>
+                <div class="list__no-data list__no-data--expected">
+                    <div class="list__no-data__description">${message}</div>
+                    <div class="list__no-data__hint">${hint}</div>
+                </div>
             `;
             return;
         }
@@ -872,7 +891,7 @@ const budgetApp = {
         }
     },
     
-    // Отображение плановых трат (без изменений)
+    // Отображение плановых трат (обновлено с новым стилем)
     renderPlans() {
         const plansContainer = document.querySelector('.plans-content');
         if (!plansContainer) return;
@@ -888,7 +907,7 @@ const budgetApp = {
         }
     },
     
-    // Отображение списка планов (без изменений)
+    // Отображение списка планов (обновлено с новым стилем)
     renderPlansList(container) {
         const activePlans = this.data.plannedExpenses.filter(plan => !plan.completed);
         const completedPlans = this.data.plannedExpenses.filter(plan => plan.completed);
@@ -896,16 +915,15 @@ const budgetApp = {
         
         if (allPlans.length === 0) {
             container.innerHTML = `
-                <div class="plans-list">
-                    <div class="no-plans">Плановых трат пока нет</div>
+                <div class="list__no-data list__no-data--plans">
+                    <div class="list__no-data__description">Плановых трат пока нет</div>
+                    <div class="list__no-data__hint">Добавьте плановую трату в форме выше</div>
                 </div>
             `;
             return;
         }
         
-        let plansHTML = `
-            <div class="plans-list">
-        `;
+        let plansHTML = `<div class="plans-list">`;
         
         allPlans.forEach(plan => {
             const formattedDate = this.formatDate(plan.date);
