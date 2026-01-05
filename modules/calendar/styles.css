@@ -1,0 +1,196 @@
+/* =========================================== */
+/* МОДУЛЬ: CALENDAR (Календарь)               */
+/* =========================================== */
+
+.calendar-modal {
+    display: none; /* Скрыт по умолчанию */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.calendar-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.calendar-content {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.calendar-close {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.calendar-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-prev,
+.calendar-next {
+    background: var(--color-background);
+    border: none;
+    color: var(--color-text);
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all var(--transition-base);
+}
+
+.calendar-prev:hover,
+.calendar-next:hover {
+    background: #333333;
+    transform: translateY(-1px);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 10px 0;
+    font-weight: 500;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 12px 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 15px;
+    border: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text);
+}
+
+.calendar-day:hover {
+    background-color: #333333;
+}
+
+.calendar-day.selected {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: var(--shadow-primary);
+}
+
+.calendar-day.other-month {
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+}
+
+.calendar-day.today {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.calendar-day.today.selected {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.calendar-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all var(--transition-base);
+}
+
+.calendar-btn:hover {
+    transform: translateY(-2px);
+}
+
+.calendar-btn:active {
+    transform: translateY(0);
+}
+
+.calendar-btn.today {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.calendar-btn.today:hover {
+    background-color: #5dbf61;
+    box-shadow: var(--shadow-success);
+}
+
+.calendar-btn.clear {
+    background-color: var(--color-text-secondary);
+    color: white;
+}
+
+.calendar-btn.clear:hover {
+    background-color: #9a9a9a;
+    box-shadow: 0 4px 12px rgba(138, 138, 138, 0.3);
+}
+
+.calendar-btn.confirm {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.calendar-btn.confirm:hover {
+    background-color: #ff8a6d;
+    box-shadow: var(--shadow-primary);
+}

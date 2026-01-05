@@ -1,0 +1,172 @@
+/* =========================================== */
+/* БАЗОВЫЕ СТИЛИ И РЕСЕТ                      */
+/* =========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Основные цвета */
+    --color-primary: #FF7653;
+    --color-success: #4CAF50;
+    --color-warning: #FFB74D;
+    --color-error: #FF7653;
+    --color-text: #FFFFFF;
+    --color-text-secondary: #8A8A8A;
+    --color-text-disabled: #3B3B3B;
+    --color-background: #272727;
+    --color-surface: #2A2A2A;
+    --color-surface-dark: #1F1F1F;
+    
+    /* Цвета графиков */
+    --chart-income: #4CAF50;
+    --chart-expense: #FF7653;
+    --chart-expected: #FFB74D;
+    --chart-balance: #FFFFFF;
+    --chart-grid: #3B3B3B;
+    
+    /* Размеры */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Тени */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-primary: 0 4px 12px rgba(255, 118, 83, 0.3);
+    --shadow-success: 0 4px 12px rgba(76, 175, 80, 0.3);
+    
+    /* Анимации */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Сброс стилей для интерактивных элементов */
+a, button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+input, button, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+}
+
+input:focus, button:focus, select:focus, textarea:focus {
+    outline: none;
+}
+
+/* Утилитарные классы */
+.container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Лоадер при загрузке приложения */
+.app-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+    z-index: 1000;
+}
+
+.loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-text-disabled);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-text {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+/* Основной контейнер приложения */
+#app {
+    min-height: 100vh;
+    padding-bottom: 80px; /* Для навигации */
+}

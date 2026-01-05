@@ -1,0 +1,308 @@
+/* =========================================== */
+/* МОДУЛЬ: HEADER (Шапка приложения)          */
+/* =========================================== */
+
+.header {
+    background-color: var(--color-surface);
+    padding: var(--spacing-xl) var(--spacing-md);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: var(--spacing-md);
+    row-gap: var(--spacing-xl);
+    justify-items: center;
+    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+.header--main .header__expected,
+.header--main .header__planned {
+    display: none;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+.header--expected .header__income,
+.header--expected .header__expenses,
+.header--expected .header__balance,
+.header--expected .header__planned {
+    display: none;
+}
+
+/* Вкладка планов: показываем только плановые расходы (крупно) */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
+.header--plans .header__planned {
+    display: flex;
+    grid-column: span 1;
+}
+
+.header--plans .header__income,
+.header--plans .header__expenses,
+.header--plans .header__balance,
+.header--plans .header__expected {
+    display: none;
+}
+
+/* Вкладка настроек: скрываем все показатели */
+.header--settings .header__income,
+.header--settings .header__expenses,
+.header--settings .header__balance,
+.header--settings .header__expected,
+.header--settings .header__planned {
+    display: none;
+}
+
+.header__logo {
+    grid-column: span 3;
+    font-size: 32px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--color-text-disabled);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.header--expected .header__logo,
+.header--plans .header__logo {
+    grid-column: span 1;
+}
+
+.header--settings .header__logo {
+    grid-column: span 1;
+}
+
+.header__item {
+    grid-column: span 1;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.header__item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.header__title {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.header__sum {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--color-text);
+    transition: color var(--transition-base);
+}
+
+/* Цвета для остатка */
+.header__balance.positive .header__sum {
+    color: var(--color-success);
+}
+
+.header__balance.negative .header__sum {
+    color: var(--color-error);
+}
+
+.header__balance.neutral .header__sum {
+    color: var(--color-text-secondary);
+}
+
+/* Цвет для ожидаемых доходы */
+.header__item.header__expected .header__sum {
+    color: var(--color-warning);
+}
+
+/* Цвет для плановых расходов */
+.header__item.header__planned .header__sum {
+    color: var(--color-error);
+}
+
+/* Индикаторы статуса в шапке */
+.expected-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface);
+    padding: var(--spacing-sm) 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.header__expected:hover .expected-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.planned-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface);
+    padding: var(--spacing-sm) 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.header__planned:hover .planned-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto 1fr;
+        row-gap: 20px;
+    }
+    
+    .header--main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .header--expected,
+    .header--plans {
+        grid-template-columns: 1fr;
+    }
+    
+    .header__logo {
+        grid-column: span 3;
+    }
+    
+    .header--expected .header__logo,
+    .header--plans .header__logo {
+        grid-column: span 1;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 560px) {
+    .header {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto 1fr;
+        row-gap: var(--spacing-md);
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .header--main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .header--expected,
+    .header--plans {
+        grid-template-columns: 1fr;
+    }
+    
+    .header__logo {
+        grid-column: span 3;
+        font-size: 28px;
+    }
+    
+    .header--expected .header__logo,
+    .header--plans .header__logo {
+        grid-column: span 1;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        grid-column: span 1;
+        padding: 20px 12px;
+    }
+    
+    .header__sum {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .header {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto repeat(4, auto);
+    }
+    
+    .header__logo {
+        font-size: 24px;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        padding: var(--spacing-md) 12px;
+    }
+    
+    .header__sum {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 360px) {
+    .header__item {
+        padding: 14px 10px;
+    }
+    
+    .header__sum {
+        font-size: 16px;
+    }
+}

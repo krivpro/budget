@@ -1,0 +1,1708 @@
+constants/modules-config.js
+
+// Конфигурация модулей приложения
+
+export const MODULES_CONFIG = {
+    // Обязательные модули
+    navigation: true,
+    ui: true,
+    
+    // Основные модули
+    header: true,
+    operations: true,
+    'expected-incomes': true,
+    plans: true,
+    chart: true,
+    calendar: true,
+    
+    // Дополнительные модули
+    settings: true,
+    collapsible: false  // Отключаем пока нет файлов
+};
+
+css/base.css
+
+/* =========================================== */
+/* БАЗОВЫЕ СТИЛИ И РЕСЕТ                      */
+/* =========================================== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* Основные цвета */
+    --color-primary: #FF7653;
+    --color-success: #4CAF50;
+    --color-warning: #FFB74D;
+    --color-error: #FF7653;
+    --color-text: #FFFFFF;
+    --color-text-secondary: #8A8A8A;
+    --color-text-disabled: #3B3B3B;
+    --color-background: #272727;
+    --color-surface: #2A2A2A;
+    --color-surface-dark: #1F1F1F;
+    
+    /* Цвета графиков */
+    --chart-income: #4CAF50;
+    --chart-expense: #FF7653;
+    --chart-expected: #FFB74D;
+    --chart-balance: #FFFFFF;
+    --chart-grid: #3B3B3B;
+    
+    /* Размеры */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    
+    /* Тени */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-primary: 0 4px 12px rgba(255, 118, 83, 0.3);
+    --shadow-success: 0 4px 12px rgba(76, 175, 80, 0.3);
+    
+    /* Анимации */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+body {
+    font-family: "Inter", sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Сброс стилей для интерактивных элементов */
+a, button {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+a {
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+input, button, select, textarea {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+}
+
+input:focus, button:focus, select:focus, textarea:focus {
+    outline: none;
+}
+
+/* Утилитарные классы */
+.container {
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
+    margin: 0 auto;
+    max-width: 1200px;
+}
+
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    margin: -1px !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    border: 0 !important;
+    opacity: 0 !important;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Лоадер при загрузке приложения */
+.app-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-background);
+    z-index: 1000;
+}
+
+.loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+}
+
+.loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-text-disabled);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loader-text {
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+/* Основной контейнер приложения */
+#app {
+    min-height: 100vh;
+    padding-bottom: 80px; /* Для навигации */
+}
+
+css/common.css
+
+/* =========================================== */
+/* ОБЩИЕ КОМПОНЕНТЫ                           */
+/* =========================================== */
+
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--color-success);
+    color: white;
+    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notification.notification--error {
+    background: var(--color-error);
+}
+
+/* Placeholders для модулей в разработке */
+.operations-placeholder,
+.expected-placeholder,
+.plans-placeholder,
+.chart-placeholder,
+.settings-placeholder {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-md);
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.operations-placeholder h3,
+.expected-placeholder h3,
+.plans-placeholder h3,
+.chart-placeholder h3,
+.settings-placeholder h3 {
+    color: var(--color-text);
+    margin-bottom: var(--spacing-md);
+}
+
+modules/calendar/index.js
+
+// Модуль календаря
+export class CalendarModule {
+    constructor(app) {
+        this.app = app;
+    }
+
+    async init() {
+        console.log('📅 Initializing Calendar Module');
+        
+        // Календарь изначально скрыт (через CSS)
+        // Функционал будет добавлен позже
+        
+        return this;
+    }
+}
+
+export default CalendarModule;
+
+modules/calendar/styles.css
+
+/* =========================================== */
+/* МОДУЛЬ: CALENDAR (Календарь)               */
+/* =========================================== */
+
+.calendar-modal {
+    display: none; /* Скрыт по умолчанию */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.calendar-modal.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.calendar-content {
+    background-color: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-lg);
+    width: 100%;
+    max-width: 400px;
+    box-shadow: var(--shadow-lg);
+}
+
+.calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.calendar-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.calendar-close {
+    background: none;
+    border: none;
+    color: var(--color-text);
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+}
+
+.calendar-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.calendar-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-prev,
+.calendar-next {
+    background: var(--color-background);
+    border: none;
+    color: var(--color-text);
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all var(--transition-base);
+}
+
+.calendar-prev:hover,
+.calendar-next:hover {
+    background: #333333;
+    transform: translateY(-1px);
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 6px;
+    margin-bottom: 20px;
+}
+
+.calendar-day-name {
+    text-align: center;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+    padding: 10px 0;
+    font-weight: 500;
+}
+
+.calendar-day {
+    text-align: center;
+    padding: 12px 0;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    font-size: 15px;
+    border: 2px solid transparent;
+    background: transparent;
+    color: var(--color-text);
+}
+
+.calendar-day:hover {
+    background-color: #333333;
+}
+
+.calendar-day.selected {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    box-shadow: var(--shadow-primary);
+}
+
+.calendar-day.other-month {
+    color: var(--color-text-secondary);
+    opacity: 0.5;
+}
+
+.calendar-day.today {
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.calendar-day.today.selected {
+    border-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.calendar-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.calendar-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 15px;
+    transition: all var(--transition-base);
+}
+
+.calendar-btn:hover {
+    transform: translateY(-2px);
+}
+
+.calendar-btn:active {
+    transform: translateY(0);
+}
+
+.calendar-btn.today {
+    background-color: var(--color-success);
+    color: white;
+}
+
+.calendar-btn.today:hover {
+    background-color: #5dbf61;
+    box-shadow: var(--shadow-success);
+}
+
+.calendar-btn.clear {
+    background-color: var(--color-text-secondary);
+    color: white;
+}
+
+.calendar-btn.clear:hover {
+    background-color: #9a9a9a;
+    box-shadow: 0 4px 12px rgba(138, 138, 138, 0.3);
+}
+
+.calendar-btn.confirm {
+    background-color: var(--color-primary);
+    color: white;
+}
+
+.calendar-btn.confirm:hover {
+    background-color: #ff8a6d;
+    box-shadow: var(--shadow-primary);
+}
+
+modules/calendar/template.html
+
+<!-- Модальное окно календаря -->
+<div class="calendar-modal" id="calendarModal">
+    <div class="calendar-content">
+        <div class="calendar-header">
+            <div class="calendar-title" id="calendarTitle">Январь 2024</div>
+            <button class="calendar-close" id="calendarClose" aria-label="Закрыть календарь">×</button>
+        </div>
+        
+        <div class="calendar-navigation">
+            <button class="calendar-prev" id="calendarPrev" aria-label="Предыдущий месяц">‹</button>
+            <button class="calendar-next" id="calendarNext" aria-label="Следующий месяц">›</button>
+        </div>
+        
+        <div class="calendar-grid" id="calendarDays">
+            <!-- Дни добавляются через JavaScript -->
+        </div>
+        
+        <div class="calendar-actions">
+            <button class="calendar-btn today" id="calendarToday">Сегодня</button>
+            <button class="calendar-btn clear" id="calendarClear">Очистить</button>
+            <button class="calendar-btn confirm" id="calendarConfirm">Готово</button>
+        </div>
+    </div>
+</div>
+
+modules/header/index.js
+
+// Модуль шапки приложения
+
+class HeaderModule {
+    constructor(app) {
+        this.app = app;
+        this.elements = null;
+    }
+
+    async init() {
+        console.log('🔧 Header Module: init() called');
+        
+        // Ждем немного, чтобы DOM точно загрузился
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Инициализируем элементы
+        this.cacheElements();
+        
+        // Если элементы не найдены, пробуем еще раз
+        if (!this.elements || !this.elements.income) {
+            console.warn('⚠️ Header elements not found, retrying...');
+            await new Promise(resolve => setTimeout(resolve, 500));
+            this.cacheElements();
+        }
+        
+        // Устанавливаем начальные значения
+        this.update();
+        
+        // Настраиваем слушатели событий
+        this.setupEventListeners();
+        
+        // Настраиваем тултипы
+        this.setupTooltips();
+        
+        console.log('✅ Header Module: initialization complete');
+        
+        return this;
+    }
+
+    cacheElements() {
+        console.log('🔍 Header Module: caching elements...');
+        
+        this.elements = {
+            income: document.querySelector('.income__sum'),
+            expenses: document.querySelector('.expenses__sum'),
+            balance: document.querySelector('.balance__sum'),
+            expected: document.querySelector('.expected__sum'),
+            planned: document.querySelector('.planned__sum'),
+            balanceContainer: document.querySelector('.header__balance')
+        };
+        
+        console.log('📋 Header elements cached:', {
+            income: !!this.elements.income,
+            expenses: !!this.elements.expenses,
+            balance: !!this.elements.balance,
+            expected: !!this.elements.expected,
+            planned: !!this.elements.planned,
+            balanceContainer: !!this.elements.balanceContainer
+        });
+    }
+
+    setupEventListeners() {
+        console.log('🎯 Header Module: setting up event listeners');
+        
+        // Слушаем события переключения вкладок
+        if (this.app && this.app.on) {
+            this.app.on('tab:changed', (data) => {
+                this.updateHeaderForTab(data.tab);
+            });
+        }
+    }
+
+    updateHeaderForTab(tabName) {
+        const header = document.querySelector('.header');
+        if (!header) return;
+
+        // Убираем все классы состояний
+        header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
+
+        // Добавляем класс для текущей вкладки
+        switch(tabName) {
+            case 'main':
+                header.classList.add('header--main');
+                break;
+            case 'expected':
+                header.classList.add('header--expected');
+                break;
+            case 'plans':
+                header.classList.add('header--plans');
+                break;
+            case 'settings':
+                header.classList.add('header--settings');
+                break;
+        }
+        
+        console.log(`🔄 Header updated for tab: ${tabName}`);
+    }
+
+    setupTooltips() {
+        // Тултипы уже есть в CSS
+    }
+
+    calculateTotals() {
+        try {
+            const operations = JSON.parse(localStorage.getItem('budgetOperations') || '[]');
+            const expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes') || '[]');
+            const plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses') || '[]');
+            
+            let incomeTotal = 0;
+            let expensesTotal = 0;
+            let expectedTotal = 0;
+            let plannedTotal = 0;
+
+            // Фактические доходы и расходы
+            operations.forEach(operation => {
+                if (operation.type === 'income') {
+                    incomeTotal += operation.amount || 0;
+                } else if (operation.type === 'expense') {
+                    expensesTotal += operation.amount || 0;
+                }
+            });
+
+            // Ожидаемые доходы (только ожидающиеся)
+            expectedIncomes.forEach(income => {
+                if (income.status === 'pending') {
+                    expectedTotal += income.amount || 0;
+                }
+            });
+
+            // Плановые расходы (только не выполненные)
+            plannedExpenses.forEach(plan => {
+                if (!plan.completed) {
+                    plannedTotal += plan.amount || 0;
+                }
+            });
+
+            const balance = incomeTotal - expensesTotal;
+
+            return {
+                incomeTotal,
+                expensesTotal,
+                expectedTotal,
+                plannedTotal,
+                balance
+            };
+            
+        } catch (error) {
+            console.error('Header Module: Error calculating totals:', error);
+            
+            // Демо данные
+            return {
+                incomeTotal: 15000.50,
+                expensesTotal: 8500.75,
+                expectedTotal: 5000.00,
+                plannedTotal: 3200.25,
+                balance: 6500.75
+            };
+        }
+    }
+
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+
+    getBalanceClass(balance) {
+        if (balance > 0) return 'positive';
+        if (balance < 0) return 'negative';
+        return 'neutral';
+    }
+
+    update() {
+        console.log('🔄 Header Module: updating display...');
+        
+        if (!this.elements) {
+            console.error('❌ Header Module: elements not cached');
+            this.cacheElements();
+        }
+        
+        const totals = this.calculateTotals();
+        
+        // Обновляем значения
+        if (this.elements.income) {
+            this.elements.income.textContent = `${this.formatCurrency(totals.incomeTotal)} Р`;
+        }
+        
+        if (this.elements.expenses) {
+            this.elements.expenses.textContent = `${this.formatCurrency(totals.expensesTotal)} Р`;
+        }
+        
+        if (this.elements.expected) {
+            this.elements.expected.textContent = `${this.formatCurrency(totals.expectedTotal)} Р`;
+        }
+        
+        if (this.elements.planned) {
+            this.elements.planned.textContent = `${this.formatCurrency(totals.plannedTotal)} Р`;
+        }
+        
+        if (this.elements.balance) {
+            const balanceText = totals.balance > 0 
+                ? `+${this.formatCurrency(totals.balance)} Р`
+                : `${this.formatCurrency(totals.balance)} Р`;
+            
+            this.elements.balance.textContent = balanceText;
+            
+            // Обновляем классы
+            if (this.elements.balanceContainer) {
+                this.elements.balanceContainer.classList.remove('positive', 'negative', 'neutral');
+                this.elements.balanceContainer.classList.add(this.getBalanceClass(totals.balance));
+            }
+        }
+        
+        console.log('✅ Header Module: update complete');
+    }
+}
+
+export default HeaderModule;
+
+modules/header/styles.css
+
+/* =========================================== */
+/* МОДУЛЬ: HEADER (Шапка приложения)          */
+/* =========================================== */
+
+.header {
+    background-color: var(--color-surface);
+    padding: var(--spacing-xl) var(--spacing-md);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: var(--spacing-md);
+    row-gap: var(--spacing-xl);
+    justify-items: center;
+    margin-bottom: var(--spacing-xl);
+    border-radius: var(--radius-xl);
+    transition: all var(--transition-base);
+}
+
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+.header--main .header__expected,
+.header--main .header__planned {
+    display: none;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+.header--expected .header__income,
+.header--expected .header__expenses,
+.header--expected .header__balance,
+.header--expected .header__planned {
+    display: none;
+}
+
+/* Вкладка планов: показываем только плановые расходы (крупно) */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
+.header--plans .header__planned {
+    display: flex;
+    grid-column: span 1;
+}
+
+.header--plans .header__income,
+.header--plans .header__expenses,
+.header--plans .header__balance,
+.header--plans .header__expected {
+    display: none;
+}
+
+/* Вкладка настроек: скрываем все показатели */
+.header--settings .header__income,
+.header--settings .header__expenses,
+.header--settings .header__balance,
+.header--settings .header__expected,
+.header--settings .header__planned {
+    display: none;
+}
+
+.header__logo {
+    grid-column: span 3;
+    font-size: 32px;
+    line-height: 1;
+    text-transform: uppercase;
+    color: var(--color-text-disabled);
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.header--expected .header__logo,
+.header--plans .header__logo {
+    grid-column: span 1;
+}
+
+.header--settings .header__logo {
+    grid-column: span 1;
+}
+
+.header__item {
+    grid-column: span 1;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+    transition: all var(--transition-base);
+}
+
+.header__item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.header__title {
+    font-size: 12px;
+    line-height: 1;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.header__sum {
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1;
+    color: var(--color-text);
+    transition: color var(--transition-base);
+}
+
+/* Цвета для остатка */
+.header__balance.positive .header__sum {
+    color: var(--color-success);
+}
+
+.header__balance.negative .header__sum {
+    color: var(--color-error);
+}
+
+.header__balance.neutral .header__sum {
+    color: var(--color-text-secondary);
+}
+
+/* Цвет для ожидаемых доходы */
+.header__item.header__expected .header__sum {
+    color: var(--color-warning);
+}
+
+/* Цвет для плановых расходов */
+.header__item.header__planned .header__sum {
+    color: var(--color-error);
+}
+
+/* Индикаторы статуса в шапке */
+.expected-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface);
+    padding: var(--spacing-sm) 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.header__expected:hover .expected-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.planned-tooltip {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--color-surface);
+    padding: var(--spacing-sm) 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    z-index: 10;
+    box-shadow: var(--shadow-lg);
+}
+
+.header__planned:hover .planned-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .header {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto 1fr;
+        row-gap: 20px;
+    }
+    
+    .header--main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .header--expected,
+    .header--plans {
+        grid-template-columns: 1fr;
+    }
+    
+    .header__logo {
+        grid-column: span 3;
+    }
+    
+    .header--expected .header__logo,
+    .header--plans .header__logo {
+        grid-column: span 1;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        grid-column: span 1;
+    }
+}
+
+@media (max-width: 560px) {
+    .header {
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: auto 1fr;
+        row-gap: var(--spacing-md);
+        padding: var(--spacing-lg) var(--spacing-md);
+    }
+    
+    .header--main {
+        grid-template-columns: repeat(3, 1fr);
+    }
+    
+    .header--expected,
+    .header--plans {
+        grid-template-columns: 1fr;
+    }
+    
+    .header__logo {
+        grid-column: span 3;
+        font-size: 28px;
+    }
+    
+    .header--expected .header__logo,
+    .header--plans .header__logo {
+        grid-column: span 1;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        grid-column: span 1;
+        padding: 20px 12px;
+    }
+    
+    .header__sum {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 400px) {
+    .header {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto repeat(4, auto);
+    }
+    
+    .header__logo {
+        font-size: 24px;
+    }
+    
+    .header__income,
+    .header__expenses,
+    .header__balance,
+    .header__expected,
+    .header__planned {
+        padding: var(--spacing-md) 12px;
+    }
+    
+    .header__sum {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 360px) {
+    .header__item {
+        padding: 14px 10px;
+    }
+    
+    .header__sum {
+        font-size: 16px;
+    }
+}
+
+modules/header/template.html
+
+<!-- Шапка приложения -->
+<header class="header container">
+    <div class="header__logo">budget</div>
+    
+    <div class="header__item header__income income">
+        <div class="header__title">Доходы</div>
+        <div class="income__sum header__sum sum">0,00 Р</div>
+    </div>
+    
+    <div class="header__item header__expenses expenses">
+        <div class="header__title">Расходы</div>
+        <div class="expenses__sum header__sum sum">0,00 Р</div>
+    </div>
+    
+    <div class="header__item header__balance balance">
+        <div class="header__title">Остаток</div>
+        <div class="balance__sum header__sum sum">0,00 Р</div>
+    </div>
+    
+    <div class="header__item header__expected expected">
+        <div class="header__title">Ожидаемые доходы</div>
+        <div class="expected__sum header__sum sum">0,00 Р</div>
+    </div>
+    
+    <div class="header__item header__planned planned">
+        <div class="header__title">Плановые расходы</div>
+        <div class="planned__sum header__sum sum">0,00 Р</div>
+    </div>
+</header>
+
+modules/navigation/index.js
+
+// Модуль навигации
+class NavigationModule {
+    constructor(app) {
+        this.app = app;
+        this.currentTab = 'main';
+    }
+
+    async init() {
+        console.log('🧭 Navigation Module: init() called');
+        
+        this.setupEventListeners();
+        
+        console.log('✅ Navigation Module: initialization complete');
+        
+        return this;
+    }
+
+    setupEventListeners() {
+        // Обработчики кликов по навигации
+        document.addEventListener('click', (e) => {
+            const navItem = e.target.closest('.bottom-nav__item');
+            if (navItem) {
+                e.preventDefault();
+                const tab = navItem.dataset.tab;
+                if (tab) {
+                    this.switchTab(tab);
+                }
+            }
+        });
+    }
+
+    switchTab(tabName) {
+        if (this.currentTab === tabName) return;
+        
+        // Обновляем активное состояние навигации
+        document.querySelectorAll('.bottom-nav__item').forEach(item => {
+            if (item.dataset.tab === tabName) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        this.currentTab = tabName;
+
+        // Отправляем событие
+        if (this.app && this.app.emit) {
+            this.app.emit('tab:changed', { tab: tabName });
+        }
+        
+        console.log(`📱 Navigation: switched to tab: ${tabName}`);
+    }
+}
+
+export default NavigationModule;
+
+modules/navigation/styles.css
+
+/* =========================================== */
+/* МОДУЛЬ: NAVIGATION (Навигация)             */
+/* =========================================== */
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 12px 0;
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+    background: var(--color-surface);
+    border-top: 1px solid #333333;
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.bottom-nav__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    color: var(--color-text-secondary);
+    flex: 1;
+    min-width: 0;
+}
+
+.bottom-nav__item:hover {
+    color: var(--color-text);
+}
+
+.bottom-nav__item.active {
+    color: var(--color-primary);
+}
+
+.bottom-nav__icon {
+    width: 24px;
+    height: 24px;
+    stroke-width: 2;
+}
+
+.bottom-nav__label {
+    font-size: 11px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+modules/navigation/template.html
+
+<!-- Навигация внизу -->
+<nav class="bottom-nav">
+    <button class="bottom-nav__item active" data-tab="main" aria-label="Главная">
+        <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+        </svg>
+        <span class="bottom-nav__label">Главная</span>
+    </button>
+    <button class="bottom-nav__item" data-tab="expected" aria-label="Ожидаемые доходы">
+        <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+        </svg>
+        <span class="bottom-nav__label">Ожидаемые</span>
+    </button>
+    <button class="bottom-nav__item" data-tab="plans" aria-label="Плановые расходы">
+        <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="9 11 12 14 22 4"></polyline>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+        </svg>
+        <span class="bottom-nav__label">Планы</span>
+    </button>
+    <button class="bottom-nav__item" data-tab="settings" aria-label="Настройки">
+        <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
+        </svg>
+        <span class="bottom-nav__label">Настройки</span>
+    </button>
+</nav>
+
+modules/ui/index.js
+
+// Модуль общих UI компонентов
+export class UIModule {
+    constructor(app) {
+        this.app = app;
+    }
+
+    async init() {
+        console.log('🎨 Initializing UI Module');
+        
+        // Здесь будут инициализированы общие UI компоненты
+        // (уведомления, модальные окна, лоадеры и т.д.)
+        
+        return this;
+    }
+
+    // Метод для показа уведомлений
+    showNotification(message, type = 'success') {
+        const notification = document.createElement('div');
+        notification.className = `notification notification--${type}`;
+        notification.textContent = message;
+        
+        // Стили для уведомления
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : '#FF7653'};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Автоматическое удаление через 3 секунды
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
+            }
+        }, 3000);
+        
+        return notification;
+    }
+
+    // Метод для подтверждения действий
+    confirm(message) {
+        return new Promise((resolve) => {
+            if (confirm(message)) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
+    }
+}
+
+export default UIModule;
+
+modules/ui/styles.css
+
+/* =========================================== */
+/* МОДУЛЬ: UI (Общие компоненты)              */
+/* =========================================== */
+
+/* Анимация появления уведомлений */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Уведомления уже определены в common.css */
+
+modules/ui/template.html
+
+<!-- UI Module Template -->
+<!-- Этот модуль не имеет видимого UI, только предоставляет функции -->
+
+app.js
+
+// Главный файл приложения - инициализирует систему модулей
+import { MODULES_CONFIG } from './constants/modules-config.js';
+
+class BudgetApp {
+    constructor() {
+        this.modules = {};
+        this.config = MODULES_CONFIG;
+        this.appContainer = document.getElementById('app');
+        this.currentTab = 'main';
+    }
+
+    async init() {
+        console.log('🚀 Budget App initializing...');
+        
+        try {
+            // Загружаем модули в правильном порядке
+            await this.loadModulesInOrder();
+            
+            // Настраиваем взаимодействие между модулями
+            this.setupModuleInteractions();
+            
+            // Настраиваем навигацию
+            this.setupNavigation();
+            
+            // Показываем активную вкладку
+            this.showTab(this.currentTab);
+            
+            // Скрываем лоадер
+            this.hideLoader();
+            
+            console.log('✅ Budget App initialized successfully');
+            
+            // Дебаг: выводим список загруженных модулей
+            console.log('📦 Loaded modules:', Object.keys(this.modules));
+            
+        } catch (error) {
+            console.error('❌ Failed to initialize app:', error);
+            this.showError('Не удалось загрузить приложение');
+        }
+    }
+
+    async loadModulesInOrder() {
+        // Определяем порядок загрузки модулей (важные модули сначала)
+        const loadOrder = [
+            'navigation',    // Навигация нужна первой
+            'header',        // Затем шапка
+            'ui',           // UI компоненты
+            'calendar',     // Календарь для форм
+            'operations',   // Основные операции
+            'expected-incomes', // Ожидаемые доходы
+            'plans',        // Планы
+            'chart',        // Графики
+            'settings',     // Настройки
+        ];
+        
+        // Загружаем модули по порядку
+        for (const moduleName of loadOrder) {
+            if (this.config[moduleName]) {
+                await this.loadModule(moduleName);
+            }
+        }
+    }
+
+    async loadModule(moduleName) {
+        try {
+            console.log(`📦 Loading module: ${moduleName}`);
+            
+            // 1. Загружаем HTML шаблон
+            await this.loadModuleTemplate(moduleName);
+            
+            // 2. Загружаем CSS стили
+            await this.loadModuleStyles(moduleName);
+            
+            // 3. Загружаем и инициализируем JavaScript
+            // ПРАВИЛЬНЫЙ ПУТЬ: относительный от корня проекта
+            const modulePath = `./modules/${moduleName}/index.js?v=${Date.now()}`;
+            
+            try {
+                const module = await import(modulePath);
+                
+                if (module.default && typeof module.default === 'function') {
+                    // Создаем экземпляр класса и инициализируем
+                    const ModuleClass = module.default;
+                    const instance = new ModuleClass(this);
+                    
+                    // Вызываем init если он есть
+                    if (typeof instance.init === 'function') {
+                        await instance.init();
+                    }
+                    
+                    this.modules[moduleName] = instance;
+                    console.log(`✅ Module "${moduleName}" JS loaded and initialized`);
+                } else {
+                    console.log(`✅ Module "${moduleName}" template and styles loaded (no JS class)`);
+                }
+            } catch (jsError) {
+                console.warn(`⚠️ JavaScript error in module "${moduleName}":`, jsError.message);
+                console.log(`✅ Module "${moduleName}" template and styles loaded (JS skipped)`);
+            }
+            
+        } catch (error) {
+            console.error(`❌ Failed to load module "${moduleName}":`, error.message);
+            // Продолжаем загрузку других модулей
+        }
+    }
+
+    async loadModuleTemplate(moduleName) {
+        try {
+            const response = await fetch(`./modules/${moduleName}/template.html`);
+            
+            if (!response.ok) {
+                throw new Error(`Template not found for module: ${moduleName}`);
+            }
+            
+            const html = await response.text();
+            
+            // Создаем контейнер для модуля
+            const moduleContainer = document.createElement('div');
+            moduleContainer.className = `module module--${moduleName}`;
+            moduleContainer.setAttribute('data-module', moduleName);
+            moduleContainer.innerHTML = html;
+            
+            // Добавляем в основное приложение
+            this.appContainer.appendChild(moduleContainer);
+            
+            console.log(`📄 Template loaded for module: ${moduleName}`);
+            
+        } catch (error) {
+            console.warn(`⚠️ No template found for module "${moduleName}", skipping...`);
+        }
+    }
+
+    async loadModuleStyles(moduleName) {
+        try {
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = `./modules/${moduleName}/styles.css`;
+            link.setAttribute('data-module', moduleName);
+            
+            // Ждем загрузки стилей
+            await new Promise((resolve, reject) => {
+                link.onload = resolve;
+                link.onerror = () => {
+                    console.warn(`⚠️ No styles found for module "${moduleName}"`);
+                    resolve(); // Не прерываем загрузку если стилей нет
+                };
+                document.head.appendChild(link);
+            });
+            
+            console.log(`🎨 Styles loaded for module: ${moduleName}`);
+            
+        } catch (error) {
+            console.warn(`⚠️ Error loading styles for module "${moduleName}":`, error);
+        }
+    }
+
+    setupNavigation() {
+        // Слушаем события переключения вкладок
+        this.on('tab:changed', (data) => {
+            if (data && data.tab) {
+                this.switchTab(data.tab);
+            }
+        });
+    }
+
+    switchTab(tabName) {
+        if (this.currentTab === tabName) return;
+        
+        // Скрываем все вкладки
+        document.querySelectorAll('.tab-content').forEach(tab => {
+            tab.classList.remove('active');
+        });
+        
+        // Показываем выбранную вкладку
+        const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+        
+        this.currentTab = tabName;
+        console.log(`📱 Switched to tab: ${tabName}`);
+    }
+
+    showTab(tabName) {
+        this.currentTab = tabName;
+        
+        // Показываем соответствующую вкладку
+        const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
+        if (targetTab) {
+            targetTab.classList.add('active');
+        }
+    }
+
+    hideLoader() {
+        const loader = document.querySelector('.app-loading');
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                if (loader.parentNode) {
+                    loader.remove();
+                }
+            }, 300);
+        }
+    }
+
+    showError(message) {
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'notification notification--error';
+        errorDiv.textContent = message;
+        document.body.appendChild(errorDiv);
+        
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        }, 5000);
+    }
+
+    setupModuleInteractions() {
+        // Здесь будут настройки взаимодействия между модулями
+        console.log('🔗 Setting up module interactions...');
+    }
+
+    // API для модулей
+    getModule(name) {
+        return this.modules[name];
+    }
+
+    emit(eventName, data) {
+        window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+    }
+
+    on(eventName, callback) {
+        window.addEventListener(eventName, (e) => callback(e.detail));
+    }
+}
+
+// Создаем и инициализируем приложение
+const app = new BudgetApp();
+
+// Инициализируем приложение при загрузке DOM
+document.addEventListener('DOMContentLoaded', () => {
+    app.init().catch(console.error);
+    
+    // Экспортируем приложение в глобальную область для отладки
+    window.budgetApp = app;
+});
+
+export default app;
+
+index.html
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <title>Budget App - Планирование бюджета</title>
+    
+    <!-- Базовые стили -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    
+    <!-- Подключение Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Контейнер приложения - сюда будут загружаться модули -->
+    <div id="app">
+        <!-- Модули будут загружаться динамически -->
+        <div class="app-loading">
+            <div class="loader">
+                <div class="loader-spinner"></div>
+                <div class="loader-text">Загрузка приложения...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Главный скрипт приложения -->
+    <script type="module" src="app.js"></script>
+
+    <!-- Тестовые данные (удалить в продакшене) -->
+<script>
+    // Проверяем, есть ли уже данные
+    const hasData = localStorage.getItem('budgetOperations') || 
+                    localStorage.getItem('budgetExpectedIncomes') || 
+                    localStorage.getItem('budgetPlannedExpenses');
+    
+    if (!hasData) {
+        // Загружаем тестовые данные
+        const script = document.createElement('script');
+        script.src = 'test-data.js';
+        document.body.appendChild(script);
+    }
+</script>
+
+</body>
+</html>
+
+test-data.js
+
+// Скрипт для создания тестовых данных
+console.log('📊 Creating test data...');
+
+// Очищаем старые данные (опционально)
+localStorage.removeItem('budgetOperations');
+localStorage.removeItem('budgetExpectedIncomes');
+localStorage.removeItem('budgetPlannedExpenses');
+
+// Создаем тестовые операции
+const testOperations = [
+    {
+        id: '1',
+        type: 'income',
+        amount: 50000.50,
+        description: 'Зарплата',
+        date: '2024-01-15',
+        createdAt: '2024-01-15T10:00:00Z'
+    },
+    {
+        id: '2',
+        type: 'expense',
+        amount: 15000.75,
+        description: 'Аренда квартиры',
+        date: '2024-01-10',
+        createdAt: '2024-01-10T09:00:00Z'
+    },
+    {
+        id: '3',
+        type: 'expense',
+        amount: 5000.25,
+        description: 'Продукты',
+        date: '2024-01-12',
+        createdAt: '2024-01-12T11:00:00Z'
+    }
+];
+
+// Создаем тестовые ожидаемые доходы
+const testExpectedIncomes = [
+    {
+        id: '4',
+        type: 'expected',
+        amount: 20000.00,
+        description: 'Фриланс проект',
+        date: '2024-01-20',
+        status: 'pending',
+        probability: 80,
+        client: 'Компания А',
+        category: 'freelance',
+        createdAt: '2024-01-05T14:00:00Z'
+    }
+];
+
+// Создаем тестовые плановые расходы
+const testPlannedExpenses = [
+    {
+        id: '5',
+        amount: 10000.50,
+        description: 'Новый телефон',
+        date: '2024-02-01',
+        completed: false,
+        createdAt: '2024-01-01T12:00:00Z'
+    }
+];
+
+// Сохраняем в localStorage
+localStorage.setItem('budgetOperations', JSON.stringify(testOperations));
+localStorage.setItem('budgetExpectedIncomes', JSON.stringify(testExpectedIncomes));
+localStorage.setItem('budgetPlannedExpenses', JSON.stringify(testPlannedExpenses));
+
+console.log('✅ Test data created successfully!');
+console.log('- Operations:', testOperations.length);
+console.log('- Expected incomes:', testExpectedIncomes.length);
+console.log('- Planned expenses:', testPlannedExpenses.length);
+
+// Показываем уведомление
+const notification = document.createElement('div');
+notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    font-size: 14px;
+    font-weight: 500;
+`;
+notification.textContent = '✅ Тестовые данные созданы! Обновите страницу.';
+document.body.appendChild(notification);
+
+// Автоматическое удаление
+setTimeout(() => {
+    if (notification.parentNode) {
+        notification.remove();
+    }
+}, 5000);

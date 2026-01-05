@@ -7,313 +7,43 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <title>Budget App - Планирование бюджета</title>
-    <link rel="stylesheet" href="css/style.css">
+    
+    <!-- Базовые стили -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/common.css">
+    
+    <!-- Подключение Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Шапка приложения -->
-    <header class="header container">
-        <div class="header__logo">budget</div>
-        
-        <div class="header__item header__income income">
-            <div class="header__title">Доходы</div>
-            <div class="income__sum header__sum sum">0,00 Р</div>
-        </div>
-        
-        <div class="header__item header__expenses expenses">
-            <div class="header__title">Расходы</div>
-            <div class="expenses__sum header__sum sum">0,00 Р</div>
-        </div>
-        
-        <div class="header__item header__balance balance">
-            <div class="header__title">Остаток</div>
-            <div class="balance__sum header__sum sum">0,00 Р</div>
-        </div>
-        
-        <!-- Новый элемент для ожидаемых доходов -->
-        <div class="header__item header__expected expected">
-            <div class="header__title">Ожидаемые доходы</div>
-            <div class="expected__sum header__sum sum">0,00 Р</div>
-        </div>
-        
-        <!-- Новый элемент для плановых расходов -->
-        <div class="header__item header__planned planned">
-            <div class="header__title">Плановые расходы</div>
-            <div class="planned__sum header__sum sum">0,00 Р</div>
-        </div>
-    </header>
-    
-    <!-- Основной контент -->
-    <main class="main container">
-        <!-- Вкладка: Главная -->
-        <div class="tab-content active" data-tab="main">
-            <!-- График статистики -->
-            <div class="list chart">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Статистика</h2>
-                </div>
-                <div class="chart-container">
-                    <canvas id="budgetChart" width="400" height="200"></canvas>
-                </div>
-                <div class="chart-stats">
-                    <!-- Фактические доходы и расходы -->
-                    <div class="stats-section stats-section--actual">
-                        <div class="stats-section__header">
-                            <h3 class="stats-section__title">Фактические</h3>
-                        </div>
-                        <div class="stats-section__content">
-                            <div class="stat-card stat-card--income">
-                                <div class="stat-card__ellipse stat-card__ellipse--income"></div>
-                                <div class="stat-card__content">
-                                    <div class="stat-card__label">Доходы</div>
-                                    <div class="stat-card__value income">0,00 Р</div>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-card--expense">
-                                <div class="stat-card__ellipse stat-card__ellipse--expense"></div>
-                                <div class="stat-card__content">
-                                    <div class="stat-card__label">Расходы</div>
-                                    <div class="stat-card__value expense">0,00 Р</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Плановые доходы и расходы -->
-                    <div class="stats-section stats-section--planned">
-                        <div class="stats-section__header">
-                            <h3 class="stats-section__title">Плановые</h3>
-                        </div>
-                        <div class="stats-section__content">
-                            <div class="stat-card stat-card--expected">
-                                <div class="stat-card__ellipse stat-card__ellipse--expected"></div>
-                                <div class="stat-card__content">
-                                    <div class="stat-card__label">Ожидаемые доходы</div>
-                                    <div class="stat-card__value expected">0,00 Р</div>
-                                </div>
-                            </div>
-                            <div class="stat-card stat-card--planned">
-                                <div class="stat-card__ellipse stat-card__ellipse--planned"></div>
-                                <div class="stat-card__content">
-                                    <div class="stat-card__label">Плановые расходы</div>
-                                    <div class="stat-card__value planned">0,00 Р</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Форма добавления операции (только доходы и расходы) -->
-            <div class="add">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Добавить операцию</h2>
-                    <div class="control-panel__categories categories">
-                        <div class="categories__item active" data-type="income">Доходы</div>
-                        <div class="categories__item" data-type="expense">Расходы</div>
-                    </div>
-                </div>
-                
-                <!-- Общие поля -->
-                <input type="text" class="add__input" id="amountInput" placeholder="Сумма" inputmode="decimal">
-                
-                <input type="text" class="add__input" id="descriptionInput" placeholder="Описание" maxlength="100">
-                
-                <input type="text" class="add__input date-input" id="dateInput" placeholder="Выберите дату" readonly>
-                <input type="date" id="realDateInput" class="visually-hidden">
-                
-                <a href="#" class="add__btn" id="addBtn">+ Добавить операцию</a> 
-            </div>
-            
-            <!-- История операций -->
-            <div class="list history">
-                <!-- Контент генерируется JavaScript -->
-            </div>
-        </div>
-
-        <!-- Вкладка: Ожидаемые доходы -->
-        <div class="tab-content" data-tab="expected">
-            <!-- Форма добавления ожидаемого дохода -->
-            <div class="add">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Добавить ожидаемый доход</h2>
-                </div>
-                
-                <input type="text" class="add__input" id="expectedAmountInput" placeholder="Сумма" inputmode="decimal">
-                
-                <input type="text" class="add__input" id="expectedDescriptionInput" placeholder="Описание" maxlength="100">
-                
-                <input type="text" class="add__input date-input" id="expectedDateInput" placeholder="Выберите дату" readonly>
-                <input type="date" id="realExpectedDateInput" class="visually-hidden">
-                
-                <!-- Дополнительные поля для ожидаемых доходов -->
-                <div class="expected-fields" id="expectedFields">
-                    <div class="form-row">
-                        <label class="form-label">Вероятность получения</label>
-                        <div class="probability-slider">
-                            <input type="range" class="add__input probability-input" id="probabilityInput" 
-                                   min="0" max="100" value="100">
-                            <div class="probability-value" id="probabilityValue">100%</div>
-                        </div>
-                    </div>
-                    
-                    <input type="text" class="add__input" id="clientInput" placeholder="Клиент/источник">
-                    
-                    <div class="form-row">
-                        <label class="form-label">Категория дохода</label>
-                        <select class="add__input" id="incomeCategory">
-                            <option value="freelance">Фриланс</option>
-                            <option value="salary">Зарплата</option>
-                            <option value="investment">Инвестиции</option>
-                            <option value="sales">Продажи</option>
-                            <option value="other">Другое</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <a href="#" class="add__btn" id="expectedAddBtn">+ Добавить ожидаемый доход</a> 
-            </div>
-            
-            <!-- Список ожидаемых доходов -->
-            <div class="list expected">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Ожидаемые доходы</h2>
-                    <div class="control-panel__categories categories">
-                        <div class="categories__item active" data-status="all">Все</div>
-                        <div class="categories__item" data-status="pending">Ожидаются</div>
-                        <div class="categories__item" data-status="received">Получены</div>
-                        <div class="categories__item" data-status="canceled">Отменены</div>
-                    </div>
-                </div>
-                <div class="expected-content">
-                    <!-- Контент генерируется JavaScript -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка: Плановые расходы -->
-        <div class="tab-content" data-tab="plans">
-            <!-- Форма добавления планового расхода -->
-            <div class="add">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Добавить плановый расход</h2>
-                </div>
-                
-                <input type="text" class="add__input" id="planAmountInput" placeholder="Сумма" inputmode="decimal">
-                
-                <input type="text" class="add__input" id="planDescriptionInput" placeholder="Описание" maxlength="100">
-                
-                <input type="text" class="add__input date-input" id="planDateInput" placeholder="Планируемая дата" readonly>
-                <input type="date" id="realPlanDateInput" class="visually-hidden">
-                
-                <a href="#" class="add__btn" id="planAddBtn">+ Добавить плановый расход</a> 
-            </div>
-            
-            <!-- Список плановых расходов -->
-            <div class="list plans">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Плановые траты</h2>
-                </div>
-                <div class="plans-content">
-                    <!-- Контент генерируется JavaScript -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Вкладка: Настройки -->
-        <div class="tab-content" data-tab="settings">
-            <div class="list settings">
-                <div class="control-panel">
-                    <h2 class="control-panel__title">Настройки</h2>
-                </div>
-                <div class="settings-content">
-                    <div class="settings-section">
-                        <h3 class="settings-section__title">Данные</h3>
-                        <div class="settings-item">
-                            <div class="settings-item__info">
-                                <div class="settings-item__title">Очистить все данные</div>
-                                <div class="settings-item__description">Удалить все операции, планы и ожидаемые доходы</div>
-                            </div>
-                            <button class="settings-btn settings-btn--danger" id="clearBtn">Очистить</button>
-                        </div>
-                    </div>
-                    <div class="settings-section">
-                        <h3 class="settings-section__title">О приложении</h3>
-                        <div class="settings-item">
-                            <div class="settings-item__info">
-                                <div class="settings-item__title">Версия</div>
-                                <div class="settings-item__description">Budget App v1.0</div>
-                            </div>
-                        </div>
-                        <div class="settings-item">
-                            <div class="settings-item__info">
-                                <div class="settings-item__title">Оптимизировано для мобильных</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <!-- Навигация внизу -->
-    <nav class="bottom-nav">
-        <button class="bottom-nav__item active" data-tab="main" aria-label="Главная">
-            <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                <polyline points="9 22 9 12 15 12 15 22"></polyline>
-            </svg>
-            <span class="bottom-nav__label">Главная</span>
-        </button>
-        <button class="bottom-nav__item" data-tab="expected" aria-label="Ожидаемые доходы">
-            <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-            </svg>
-            <span class="bottom-nav__label">Ожидаемые</span>
-        </button>
-        <button class="bottom-nav__item" data-tab="plans" aria-label="Плановые расходы">
-            <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 11 12 14 22 4"></polyline>
-                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
-            </svg>
-            <span class="bottom-nav__label">Планы</span>
-        </button>
-        <button class="bottom-nav__item" data-tab="settings" aria-label="Настройки">
-            <svg class="bottom-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"></path>
-            </svg>
-            <span class="bottom-nav__label">Настройки</span>
-        </button>
-    </nav>
-
-    <!-- Модальное окно календаря -->
-    <div class="calendar-modal" id="calendarModal">
-        <div class="calendar-content">
-            <div class="calendar-header">
-                <div class="calendar-title" id="calendarTitle">Январь 2024</div>
-                <button class="calendar-close" id="calendarClose" aria-label="Закрыть календарь">×</button>
-            </div>
-            
-            <div class="calendar-navigation">
-                <button class="calendar-prev" id="calendarPrev" aria-label="Предыдущий месяц">‹</button>
-                <button class="calendar-next" id="calendarNext" aria-label="Следующий месяц">›</button>
-            </div>
-            
-            <div class="calendar-grid" id="calendarDays">
-                <!-- Дни добавляются через JavaScript -->
-            </div>
-            
-            <div class="calendar-actions">
-                <button class="calendar-btn today" id="calendarToday">Сегодня</button>
-                <button class="calendar-btn clear" id="calendarClear">Очистить</button>
-                <button class="calendar-btn confirm" id="calendarConfirm">Готово</button>
+    <!-- Контейнер приложения - сюда будут загружаться модули -->
+    <div id="app">
+        <!-- Модули будут загружаться динамически -->
+        <div class="app-loading">
+            <div class="loader">
+                <div class="loader-spinner"></div>
+                <div class="loader-text">Загрузка приложения...</div>
             </div>
         </div>
     </div>
 
-    <!-- Подключаем Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Подключаем главный скрипт приложения -->
-    <script type="module" src="js/app.js"></script>
+    <!-- Главный скрипт приложения -->
+    <script type="module" src="app.js"></script>
+
+    <!-- Тестовые данные (удалить в продакшене) -->
+<script>
+    // Проверяем, есть ли уже данные
+    const hasData = localStorage.getItem('budgetOperations') || 
+                    localStorage.getItem('budgetExpectedIncomes') || 
+                    localStorage.getItem('budgetPlannedExpenses');
+    
+    if (!hasData) {
+        // Загружаем тестовые данные
+        const script = document.createElement('script');
+        script.src = 'test-data.js';
+        document.body.appendChild(script);
+    }
+</script>
+
 </body>
 </html>

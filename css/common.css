@@ -1,0 +1,47 @@
+/* =========================================== */
+/* ОБЩИЕ КОМПОНЕНТЫ                           */
+/* =========================================== */
+
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--color-success);
+    color: white;
+    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notification.notification--error {
+    background: var(--color-error);
+}
+
+/* Placeholders для модулей в разработке */
+.operations-placeholder,
+.expected-placeholder,
+.plans-placeholder,
+.chart-placeholder,
+.settings-placeholder {
+    background: var(--color-surface);
+    border-radius: var(--radius-xl);
+    padding: var(--spacing-xl);
+    margin: var(--spacing-md);
+    text-align: center;
+    color: var(--color-text-secondary);
+}
+
+.operations-placeholder h3,
+.expected-placeholder h3,
+.plans-placeholder h3,
+.chart-placeholder h3,
+.settings-placeholder h3 {
+    color: var(--color-text);
+    margin-bottom: var(--spacing-md);
+}
