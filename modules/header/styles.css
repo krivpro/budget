@@ -16,63 +16,18 @@
     transition: all var(--transition-base);
 }
 
-/* Главная вкладка: показываем доходы, расходы, остаток */
-.header--main {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.header--main .header__income,
-.header--main .header__expenses,
-.header--main .header__balance {
-    display: flex;
-}
-
-.header--main .header__expected,
-.header--main .header__planned {
+/* Все элементы скрыты по умолчанию */
+.header__item {
     display: none;
-}
-
-/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
-.header--expected {
-    grid-template-columns: 1fr;
-}
-
-.header--expected .header__expected {
-    display: flex;
     grid-column: span 1;
-}
-
-.header--expected .header__income,
-.header--expected .header__expenses,
-.header--expected .header__balance,
-.header--expected .header__planned {
-    display: none;
-}
-
-/* Вкладка планов: показываем только плановые расходы (крупно) */
-.header--plans {
-    grid-template-columns: 1fr;
-}
-
-.header--plans .header__planned {
-    display: flex;
-    grid-column: span 1;
-}
-
-.header--plans .header__income,
-.header--plans .header__expenses,
-.header--plans .header__balance,
-.header--plans .header__expected {
-    display: none;
-}
-
-/* Вкладка настроек: скрываем все показатели */
-.header--settings .header__income,
-.header--settings .header__expenses,
-.header--settings .header__balance,
-.header--settings .header__expected,
-.header--settings .header__planned {
-    display: none;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+    transition: all var(--transition-base);
 }
 
 .header__logo {
@@ -85,26 +40,56 @@
     letter-spacing: 2px;
 }
 
-.header--expected .header__logo,
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__logo {
+    grid-column: span 3;
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__logo {
+    grid-column: span 1;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка планов: показываем только плановые расходы (крупно) */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
 .header--plans .header__logo {
     grid-column: span 1;
 }
 
-.header--settings .header__logo {
+.header--plans .header__planned {
+    display: flex;
     grid-column: span 1;
 }
 
-.header__item {
+/* Вкладка настроек: показываем только логотип */
+.header--settings {
+    grid-template-columns: 1fr;
+}
+
+.header--settings .header__logo {
     grid-column: span 1;
-    padding: var(--spacing-lg) var(--spacing-md);
-    background: var(--color-background);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-    transition: all var(--transition-base);
 }
 
 .header__item:hover {
@@ -141,7 +126,7 @@
     color: var(--color-text-secondary);
 }
 
-/* Цвет для ожидаемых доходы */
+/* Цвет для ожидаемых доходов */
 .header__item.header__expected .header__sum {
     color: var(--color-warning);
 }
@@ -211,7 +196,8 @@
     }
     
     .header--expected,
-    .header--plans {
+    .header--plans,
+    .header--settings {
         grid-template-columns: 1fr;
     }
     
@@ -220,15 +206,8 @@
     }
     
     .header--expected .header__logo,
-    .header--plans .header__logo {
-        grid-column: span 1;
-    }
-    
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
+    .header--plans .header__logo,
+    .header--settings .header__logo {
         grid-column: span 1;
     }
 }
@@ -246,7 +225,8 @@
     }
     
     .header--expected,
-    .header--plans {
+    .header--plans,
+    .header--settings {
         grid-template-columns: 1fr;
     }
     
@@ -256,16 +236,12 @@
     }
     
     .header--expected .header__logo,
-    .header--plans .header__logo {
+    .header--plans .header__logo,
+    .header--settings .header__logo {
         grid-column: span 1;
     }
     
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
-        grid-column: span 1;
+    .header__item {
         padding: 20px 12px;
     }
     
@@ -277,18 +253,14 @@
 @media (max-width: 400px) {
     .header {
         grid-template-columns: 1fr;
-        grid-template-rows: auto repeat(4, auto);
+        grid-template-rows: auto repeat(3, auto);
     }
     
     .header__logo {
         font-size: 24px;
     }
     
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
+    .header__item {
         padding: var(--spacing-md) 12px;
     }
     
