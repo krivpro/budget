@@ -8,6 +8,7 @@ class BudgetApp {
         this.appContainer = document.getElementById('app');
         this.currentTab = 'main';
         this.initialized = false;
+        this.eventListeners = new Map();
     }
 
     async init() {
@@ -16,11 +17,17 @@ class BudgetApp {
         }
 
         try {
-            await this.loadModulesInOrder();
-            this.setupModuleInteractions();
-            this.setupNavigation();
-            this.showTab(this.currentTab);
-            this.hideLoader();
+            // 1. Создаем основную структуру приложения
+            this.createAppStructure();
+            
+            // 2. Загружаем модули в правильном порядке
+            await this.loadModules();
+            
+            // 3. Инициализируем вкладки
+            this.initTabs();
+            
+            // 4. Показываем приложение
+            this.showApp();
             
             this.initialized = true;
             
@@ -31,30 +38,47 @@ class BudgetApp {
         }
     }
 
-    async loadModulesInOrder() {
+    createAppStructure() {
+        // Создаем основной контейнер для контента
+        this.appContent = document.createElement('div');
+        this.appContent.className = 'app-content';
+        this.appContent.style.display = 'none';
+        this.appContainer.appendChild(this.appContent);
+
+        // Создаем контейнер для модальных окон
+        this.modalsContainer = document.createElement('div');
+        this.modalsContainer.id = 'modals-container';
+        this.appContainer.appendChild(this.modalsContainer);
+    }
+
+    async loadModules() {
+        // Порядок загрузки важен!
         const loadOrder = [
-            'navigation',
-            'header',
-            'ui',
-            'calendar',
-            'operations',
-            'expected-incomes',
-            'plans',
-            'chart',
-            'settings',
+            'ui',           // Сначала общие UI компоненты
+            'header',       // Потом шапка
+            'navigation',   // Потом навигация
+            'calendar',     // Календарь нужен для форм
+            'chart',        // Графики для главной вкладки
+            'operations',   // Главная вкладка
+            'expected-incomes', // Вкладка ожидаемых доходов
+            'plans',        // Вкладка планов
+            'settings',     // Вкладка настроек
         ];
         
         for (const moduleName of loadOrder) {
             if (this.config[moduleName]) {
-                await this.loadModule(moduleName);
+                try {
+                    await this.loadSingleModule(moduleName);
+                } catch (error) {
+                    console.warn(`Module ${moduleName} failed to load:`, error);
+                    // Продолжаем загрузку других модулей
+                }
             }
         }
     }
 
-    async loadModule(moduleName) {
-        await this.loadModuleTemplate(moduleName);
-        await this.loadModuleStyles(moduleName);
-        
+    async loadSingleModule(moduleName) {
+        // Загружаем модуль
         const modulePath = `./modules/${moduleName}/index.js`;
         
         try {
@@ -69,79 +93,60 @@ class BudgetApp {
                 }
                 
                 this.modules[moduleName] = instance;
+                console.log(`✅ Module "${moduleName}" loaded`);
             }
         } catch (error) {
-            // Игнорируем ошибки загрузки JS модуля
+            console.error(`❌ Failed to load module "${moduleName}":`, error);
+            throw error;
         }
     }
 
-    async loadModuleTemplate(moduleName) {
-        try {
-            const response = await fetch(`./modules/${moduleName}/template.html`);
-            
-            if (response.ok) {
-                const html = await response.text();
-                
-                const moduleContainer = document.createElement('div');
-                moduleContainer.className = `module module--${moduleName}`;
-                moduleContainer.setAttribute('data-module', moduleName);
-                moduleContainer.innerHTML = html;
-                
-                this.appContainer.appendChild(moduleContainer);
-            }
-        } catch (error) {
-            // Игнорируем ошибки загрузки шаблонов
-        }
-    }
-
-    async loadModuleStyles(moduleName) {
-        return new Promise((resolve) => {
-            const link = document.createElement('link');
-            link.rel = 'stylesheet';
-            link.href = `./modules/${moduleName}/styles.css`;
-            link.setAttribute('data-module', moduleName);
-            
-            link.onload = resolve;
-            link.onerror = resolve;
-            
-            document.head.appendChild(link);
-        });
-    }
-
-    setupNavigation() {
-        this.on('tab:changed', (data) => {
-            if (data && data.tab) {
-                this.switchTab(data.tab);
-            }
-        });
+    initTabs() {
+        // По умолчанию показываем главную вкладку
+        this.switchTab('main');
     }
 
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
         
-        document.querySelectorAll('.tab-content').forEach(tab => {
+        this.currentTab = tabName;
+        
+        // Скрываем все вкладки
+        const tabContents = this.appContent.querySelectorAll('.tab-content');
+        tabContents.forEach(tab => {
             tab.classList.remove('active');
         });
         
-        const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
+        // Показываем выбранную вкладку
+        const targetTab = this.appContent.querySelector(`.tab-content[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
         }
         
-        this.currentTab = tabName;
+        // Обновляем активное состояние в навигации
+        const navItems = this.appContent.querySelectorAll('.bottom-nav__item');
+        navItems.forEach(item => {
+            if (item.dataset.tab === tabName) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        // Уведомляем модули о смене вкладки
+        this.emit('tab:changed', { tab: tabName });
     }
 
-    showTab(tabName) {
-        this.currentTab = tabName;
+    showApp() {
+        // Скрываем лоадер
+        this.hideLoader();
         
-        const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
-        if (targetTab) {
-            targetTab.classList.add('active');
-        }
+        // Показываем контент
+        this.appContent.style.display = 'block';
     }
 
     hideLoader() {
-        const loader = document.querySelector('.app-loading');
+        const loader = this.appContainer.querySelector('.app-loading');
         if (loader) {
             loader.style.opacity = '0';
             setTimeout(() => {
@@ -165,28 +170,46 @@ class BudgetApp {
         }, 5000);
     }
 
-    setupModuleInteractions() {
-        // Настройки взаимодействия между модулями
+    // Event system
+    emit(eventName, data) {
+        const listeners = this.eventListeners.get(eventName) || [];
+        listeners.forEach(callback => {
+            try {
+                callback(data);
+            } catch (error) {
+                console.error(`Error in event listener for "${eventName}":`, error);
+            }
+        });
+        
+        // Также диспатчим DOM событие для совместимости
+        window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+    }
+
+    on(eventName, callback) {
+        if (!this.eventListeners.has(eventName)) {
+            this.eventListeners.set(eventName, []);
+        }
+        this.eventListeners.get(eventName).push(callback);
+        
+        // Также слушаем DOM события для совместимости
+        window.addEventListener(eventName, (e) => callback(e.detail));
+    }
+
+    // Public API для модулей
+    getContainer() {
+        return this.appContent;
+    }
+
+    getModalsContainer() {
+        return this.modalsContainer;
+    }
+
+    getCurrentTab() {
+        return this.currentTab;
     }
 
     getModule(name) {
         return this.modules[name];
-    }
-
-    emit(eventName, data) {
-        try {
-            window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
-        } catch (error) {
-            console.error('Error emitting event:', error);
-        }
-    }
-
-    on(eventName, callback) {
-        try {
-            window.addEventListener(eventName, (e) => callback(e.detail));
-        } catch (error) {
-            console.error('Error adding event listener:', error);
-        }
     }
 }
 

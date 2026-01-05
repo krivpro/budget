@@ -1,5 +1,4 @@
-// Модуль шапки приложения
-
+// modules/header/index.js
 class HeaderModule {
     constructor(app) {
         this.app = app;
@@ -7,14 +6,59 @@ class HeaderModule {
     }
 
     async init() {
-        this.cacheElements();
-        this.update();
+        console.log('Header Module initialized');
+        this.createHeader();
         this.setupEventListeners();
+        this.updateHeaderForTab(this.app.getCurrentTab());
+        this.update();
         return this;
     }
 
+    createHeader() {
+        const appContent = this.app.getContainer();
+        
+        const headerHTML = `
+            <header class="header container">
+                <div class="header__logo">budget</div>
+                
+                <div class="header__item header__income income">
+                    <div class="header__title">Доходы</div>
+                    <div class="income__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__expenses expenses">
+                    <div class="header__title">Расходы</div>
+                    <div class="expenses__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__balance balance">
+                    <div class="header__title">Остаток</div>
+                    <div class="balance__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__expected expected">
+                    <div class="header__title">Ожидаемые доходы</div>
+                    <div class="expected__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__planned planned">
+                    <div class="header__title">Плановые расходы</div>
+                    <div class="planned__sum header__sum sum">0,00 Р</div>
+                </div>
+            </header>
+        `;
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.innerHTML = headerHTML;
+        appContent.appendChild(headerDiv.firstElementChild);
+        
+        this.cacheElements();
+    }
+
     cacheElements() {
+        const header = document.querySelector('.header');
         this.elements = {
+            header: header,
             income: document.querySelector('.income__sum'),
             expenses: document.querySelector('.expenses__sum'),
             balance: document.querySelector('.balance__sum'),
@@ -25,135 +69,54 @@ class HeaderModule {
     }
 
     setupEventListeners() {
-        if (this.app && this.app.on) {
-            this.app.on('tab:changed', (data) => {
+        // Слушаем событие смены вкладки
+        this.app.on('tab:changed', (data) => {
+            if (data && data.tab) {
+                console.log('Header: received tab change event:', data.tab);
                 this.updateHeaderForTab(data.tab);
-            });
-        }
+            }
+        });
     }
 
     updateHeaderForTab(tabName) {
-        const header = document.querySelector('.header');
-        if (!header) return;
-
-        header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
-
+        if (!this.elements || !this.elements.header) {
+            console.log('Header: elements not found');
+            return;
+        }
+        
+        console.log('Header: updating for tab:', tabName);
+        
+        // Убираем все классы состояний
+        this.elements.header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
+        
+        // Добавляем класс для текущей вкладки
         switch(tabName) {
             case 'main':
-                header.classList.add('header--main');
+                this.elements.header.classList.add('header--main');
                 break;
             case 'expected':
-                header.classList.add('header--expected');
+                this.elements.header.classList.add('header--expected');
                 break;
             case 'plans':
-                header.classList.add('header--plans');
+                this.elements.header.classList.add('header--plans');
                 break;
             case 'settings':
-                header.classList.add('header--settings');
+                this.elements.header.classList.add('header--settings');
                 break;
         }
-    }
-
-    calculateTotals() {
-        try {
-            const operations = JSON.parse(localStorage.getItem('budgetOperations') || '[]');
-            const expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes') || '[]');
-            const plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses') || '[]');
-            
-            let incomeTotal = 0;
-            let expensesTotal = 0;
-            let expectedTotal = 0;
-            let plannedTotal = 0;
-
-            operations.forEach(operation => {
-                if (operation.type === 'income') {
-                    incomeTotal += operation.amount || 0;
-                } else if (operation.type === 'expense') {
-                    expensesTotal += operation.amount || 0;
-                }
-            });
-
-            expectedIncomes.forEach(income => {
-                if (income.status === 'pending') {
-                    expectedTotal += income.amount || 0;
-                }
-            });
-
-            plannedExpenses.forEach(plan => {
-                if (!plan.completed) {
-                    plannedTotal += plan.amount || 0;
-                }
-            });
-
-            const balance = incomeTotal - expensesTotal;
-
-            return {
-                incomeTotal,
-                expensesTotal,
-                expectedTotal,
-                plannedTotal,
-                balance
-            };
-            
-        } catch (error) {
-            return {
-                incomeTotal: 0,
-                expensesTotal: 0,
-                expectedTotal: 0,
-                plannedTotal: 0,
-                balance: 0
-            };
-        }
-    }
-
-    formatCurrency(amount) {
-        return new Intl.NumberFormat('ru-RU', {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2
-        }).format(amount);
-    }
-
-    getBalanceClass(balance) {
-        if (balance > 0) return 'positive';
-        if (balance < 0) return 'negative';
-        return 'neutral';
+        
+        console.log('Header classes:', this.elements.header.className);
     }
 
     update() {
-        if (!this.elements) {
-            this.cacheElements();
-        }
+        if (!this.elements) return;
         
-        const totals = this.calculateTotals();
-        
-        if (this.elements.income) {
-            this.elements.income.textContent = `${this.formatCurrency(totals.incomeTotal)} Р`;
-        }
-        
-        if (this.elements.expenses) {
-            this.elements.expenses.textContent = `${this.formatCurrency(totals.expensesTotal)} Р`;
-        }
-        
-        if (this.elements.expected) {
-            this.elements.expected.textContent = `${this.formatCurrency(totals.expectedTotal)} Р`;
-        }
-        
-        if (this.elements.planned) {
-            this.elements.planned.textContent = `${this.formatCurrency(totals.plannedTotal)} Р`;
-        }
-        
-        if (this.elements.balance) {
-            const balanceText = totals.balance > 0 
-                ? `+${this.formatCurrency(totals.balance)} Р`
-                : `${this.formatCurrency(totals.balance)} Р`;
-            
-            this.elements.balance.textContent = balanceText;
-            
-            if (this.elements.balanceContainer) {
-                this.elements.balanceContainer.classList.remove('positive', 'negative', 'neutral');
-                this.elements.balanceContainer.classList.add(this.getBalanceClass(totals.balance));
-            }
-        }
+        // Заглушка - всегда показывает 0
+        if (this.elements.income) this.elements.income.textContent = '0,00 Р';
+        if (this.elements.expenses) this.elements.expenses.textContent = '0,00 Р';
+        if (this.elements.expected) this.elements.expected.textContent = '0,00 Р';
+        if (this.elements.planned) this.elements.planned.textContent = '0,00 Р';
+        if (this.elements.balance) this.elements.balance.textContent = '0,00 Р';
     }
 }
 

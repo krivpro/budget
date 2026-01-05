@@ -201,27 +201,6 @@ css/common.css
 /* ОБЩИЕ КОМПОНЕНТЫ                           */
 /* =========================================== */
 
-/* Уведомления */
-.notification {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: var(--color-success);
-    color: white;
-    padding: 16px 24px;
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-lg);
-    z-index: 2000;
-    animation: slideIn 0.3s ease;
-    max-width: 300px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.notification.notification--error {
-    background: var(--color-error);
-}
-
 /* Placeholders для модулей в разработке */
 .operations-placeholder,
 .expected-placeholder,
@@ -254,11 +233,6 @@ export class CalendarModule {
     }
 
     async init() {
-        console.log('📅 Initializing Calendar Module');
-        
-        // Календарь изначально скрыт (через CSS)
-        // Функционал будет добавлен позже
-        
         return this;
     }
 }
@@ -495,6 +469,8 @@ modules/header/index.js
 
 // Модуль шапки приложения
 
+// Модуль шапки приложения
+
 class HeaderModule {
     constructor(app) {
         this.app = app;
@@ -502,38 +478,13 @@ class HeaderModule {
     }
 
     async init() {
-        console.log('🔧 Header Module: init() called');
-        
-        // Ждем немного, чтобы DOM точно загрузился
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Инициализируем элементы
         this.cacheElements();
-        
-        // Если элементы не найдены, пробуем еще раз
-        if (!this.elements || !this.elements.income) {
-            console.warn('⚠️ Header elements not found, retrying...');
-            await new Promise(resolve => setTimeout(resolve, 500));
-            this.cacheElements();
-        }
-        
-        // Устанавливаем начальные значения
         this.update();
-        
-        // Настраиваем слушатели событий
         this.setupEventListeners();
-        
-        // Настраиваем тултипы
-        this.setupTooltips();
-        
-        console.log('✅ Header Module: initialization complete');
-        
         return this;
     }
 
     cacheElements() {
-        console.log('🔍 Header Module: caching elements...');
-        
         this.elements = {
             income: document.querySelector('.income__sum'),
             expenses: document.querySelector('.expenses__sum'),
@@ -542,21 +493,9 @@ class HeaderModule {
             planned: document.querySelector('.planned__sum'),
             balanceContainer: document.querySelector('.header__balance')
         };
-        
-        console.log('📋 Header elements cached:', {
-            income: !!this.elements.income,
-            expenses: !!this.elements.expenses,
-            balance: !!this.elements.balance,
-            expected: !!this.elements.expected,
-            planned: !!this.elements.planned,
-            balanceContainer: !!this.elements.balanceContainer
-        });
     }
 
     setupEventListeners() {
-        console.log('🎯 Header Module: setting up event listeners');
-        
-        // Слушаем события переключения вкладок
         if (this.app && this.app.on) {
             this.app.on('tab:changed', (data) => {
                 this.updateHeaderForTab(data.tab);
@@ -568,10 +507,8 @@ class HeaderModule {
         const header = document.querySelector('.header');
         if (!header) return;
 
-        // Убираем все классы состояний
         header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
 
-        // Добавляем класс для текущей вкладки
         switch(tabName) {
             case 'main':
                 header.classList.add('header--main');
@@ -586,12 +523,6 @@ class HeaderModule {
                 header.classList.add('header--settings');
                 break;
         }
-        
-        console.log(`🔄 Header updated for tab: ${tabName}`);
-    }
-
-    setupTooltips() {
-        // Тултипы уже есть в CSS
     }
 
     calculateTotals() {
@@ -605,7 +536,6 @@ class HeaderModule {
             let expectedTotal = 0;
             let plannedTotal = 0;
 
-            // Фактические доходы и расходы
             operations.forEach(operation => {
                 if (operation.type === 'income') {
                     incomeTotal += operation.amount || 0;
@@ -614,14 +544,12 @@ class HeaderModule {
                 }
             });
 
-            // Ожидаемые доходы (только ожидающиеся)
             expectedIncomes.forEach(income => {
                 if (income.status === 'pending') {
                     expectedTotal += income.amount || 0;
                 }
             });
 
-            // Плановые расходы (только не выполненные)
             plannedExpenses.forEach(plan => {
                 if (!plan.completed) {
                     plannedTotal += plan.amount || 0;
@@ -639,15 +567,12 @@ class HeaderModule {
             };
             
         } catch (error) {
-            console.error('Header Module: Error calculating totals:', error);
-            
-            // Демо данные
             return {
-                incomeTotal: 15000.50,
-                expensesTotal: 8500.75,
-                expectedTotal: 5000.00,
-                plannedTotal: 3200.25,
-                balance: 6500.75
+                incomeTotal: 0,
+                expensesTotal: 0,
+                expectedTotal: 0,
+                plannedTotal: 0,
+                balance: 0
             };
         }
     }
@@ -666,16 +591,12 @@ class HeaderModule {
     }
 
     update() {
-        console.log('🔄 Header Module: updating display...');
-        
         if (!this.elements) {
-            console.error('❌ Header Module: elements not cached');
             this.cacheElements();
         }
         
         const totals = this.calculateTotals();
         
-        // Обновляем значения
         if (this.elements.income) {
             this.elements.income.textContent = `${this.formatCurrency(totals.incomeTotal)} Р`;
         }
@@ -699,14 +620,11 @@ class HeaderModule {
             
             this.elements.balance.textContent = balanceText;
             
-            // Обновляем классы
             if (this.elements.balanceContainer) {
                 this.elements.balanceContainer.classList.remove('positive', 'negative', 'neutral');
                 this.elements.balanceContainer.classList.add(this.getBalanceClass(totals.balance));
             }
         }
-        
-        console.log('✅ Header Module: update complete');
     }
 }
 
@@ -732,63 +650,18 @@ modules/header/styles.css
     transition: all var(--transition-base);
 }
 
-/* Главная вкладка: показываем доходы, расходы, остаток */
-.header--main {
-    grid-template-columns: repeat(3, 1fr);
-}
-
-.header--main .header__income,
-.header--main .header__expenses,
-.header--main .header__balance {
-    display: flex;
-}
-
-.header--main .header__expected,
-.header--main .header__planned {
+/* Все элементы скрыты по умолчанию */
+.header__item {
     display: none;
-}
-
-/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
-.header--expected {
-    grid-template-columns: 1fr;
-}
-
-.header--expected .header__expected {
-    display: flex;
     grid-column: span 1;
-}
-
-.header--expected .header__income,
-.header--expected .header__expenses,
-.header--expected .header__balance,
-.header--expected .header__planned {
-    display: none;
-}
-
-/* Вкладка планов: показываем только плановые расходы (крупно) */
-.header--plans {
-    grid-template-columns: 1fr;
-}
-
-.header--plans .header__planned {
-    display: flex;
-    grid-column: span 1;
-}
-
-.header--plans .header__income,
-.header--plans .header__expenses,
-.header--plans .header__balance,
-.header--plans .header__expected {
-    display: none;
-}
-
-/* Вкладка настроек: скрываем все показатели */
-.header--settings .header__income,
-.header--settings .header__expenses,
-.header--settings .header__balance,
-.header--settings .header__expected,
-.header--settings .header__planned {
-    display: none;
+    padding: var(--spacing-lg) var(--spacing-md);
+    background: var(--color-background);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    text-align: center;
+    transition: all var(--transition-base);
 }
 
 .header__logo {
@@ -801,26 +674,56 @@ modules/header/styles.css
     letter-spacing: 2px;
 }
 
-.header--expected .header__logo,
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__logo {
+    grid-column: span 3;
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы (крупно) */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__logo {
+    grid-column: span 1;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка планов: показываем только плановые расходы (крупно) */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
 .header--plans .header__logo {
     grid-column: span 1;
 }
 
-.header--settings .header__logo {
+.header--plans .header__planned {
+    display: flex;
     grid-column: span 1;
 }
 
-.header__item {
+/* Вкладка настроек: показываем только логотип */
+.header--settings {
+    grid-template-columns: 1fr;
+}
+
+.header--settings .header__logo {
     grid-column: span 1;
-    padding: var(--spacing-lg) var(--spacing-md);
-    background: var(--color-background);
-    border-radius: var(--radius-lg);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    text-align: center;
-    transition: all var(--transition-base);
 }
 
 .header__item:hover {
@@ -857,7 +760,7 @@ modules/header/styles.css
     color: var(--color-text-secondary);
 }
 
-/* Цвет для ожидаемых доходы */
+/* Цвет для ожидаемых доходов */
 .header__item.header__expected .header__sum {
     color: var(--color-warning);
 }
@@ -927,7 +830,8 @@ modules/header/styles.css
     }
     
     .header--expected,
-    .header--plans {
+    .header--plans,
+    .header--settings {
         grid-template-columns: 1fr;
     }
     
@@ -936,15 +840,8 @@ modules/header/styles.css
     }
     
     .header--expected .header__logo,
-    .header--plans .header__logo {
-        grid-column: span 1;
-    }
-    
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
+    .header--plans .header__logo,
+    .header--settings .header__logo {
         grid-column: span 1;
     }
 }
@@ -962,7 +859,8 @@ modules/header/styles.css
     }
     
     .header--expected,
-    .header--plans {
+    .header--plans,
+    .header--settings {
         grid-template-columns: 1fr;
     }
     
@@ -972,16 +870,12 @@ modules/header/styles.css
     }
     
     .header--expected .header__logo,
-    .header--plans .header__logo {
+    .header--plans .header__logo,
+    .header--settings .header__logo {
         grid-column: span 1;
     }
     
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
-        grid-column: span 1;
+    .header__item {
         padding: 20px 12px;
     }
     
@@ -993,18 +887,14 @@ modules/header/styles.css
 @media (max-width: 400px) {
     .header {
         grid-template-columns: 1fr;
-        grid-template-rows: auto repeat(4, auto);
+        grid-template-rows: auto repeat(3, auto);
     }
     
     .header__logo {
         font-size: 24px;
     }
     
-    .header__income,
-    .header__expenses,
-    .header__balance,
-    .header__expected,
-    .header__planned {
+    .header__item {
         padding: var(--spacing-md) 12px;
     }
     
@@ -1026,7 +916,7 @@ modules/header/styles.css
 modules/header/template.html
 
 <!-- Шапка приложения -->
-<header class="header container">
+<header class="header container header--main">
     <div class="header__logo">budget</div>
     
     <div class="header__item header__income income">
@@ -1065,17 +955,11 @@ class NavigationModule {
     }
 
     async init() {
-        console.log('🧭 Navigation Module: init() called');
-        
         this.setupEventListeners();
-        
-        console.log('✅ Navigation Module: initialization complete');
-        
         return this;
     }
 
     setupEventListeners() {
-        // Обработчики кликов по навигации
         document.addEventListener('click', (e) => {
             const navItem = e.target.closest('.bottom-nav__item');
             if (navItem) {
@@ -1091,7 +975,6 @@ class NavigationModule {
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
         
-        // Обновляем активное состояние навигации
         document.querySelectorAll('.bottom-nav__item').forEach(item => {
             if (item.dataset.tab === tabName) {
                 item.classList.add('active');
@@ -1102,12 +985,9 @@ class NavigationModule {
 
         this.currentTab = tabName;
 
-        // Отправляем событие
         if (this.app && this.app.emit) {
             this.app.emit('tab:changed', { tab: tabName });
         }
-        
-        console.log(`📱 Navigation: switched to tab: ${tabName}`);
     }
 }
 
@@ -1213,40 +1093,16 @@ export class UIModule {
     }
 
     async init() {
-        console.log('🎨 Initializing UI Module');
-        
-        // Здесь будут инициализированы общие UI компоненты
-        // (уведомления, модальные окна, лоадеры и т.д.)
-        
         return this;
     }
 
-    // Метод для показа уведомлений
     showNotification(message, type = 'success') {
         const notification = document.createElement('div');
         notification.className = `notification notification--${type}`;
         notification.textContent = message;
         
-        // Стили для уведомления
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: ${type === 'success' ? '#4CAF50' : '#FF7653'};
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-            max-width: 300px;
-            font-size: 14px;
-            font-weight: 500;
-        `;
-        
         document.body.appendChild(notification);
         
-        // Автоматическое удаление через 3 секунды
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.style.animation = 'slideIn 0.3s ease reverse';
@@ -1261,7 +1117,6 @@ export class UIModule {
         return notification;
     }
 
-    // Метод для подтверждения действий
     confirm(message) {
         return new Promise((resolve) => {
             if (confirm(message)) {
@@ -1293,7 +1148,30 @@ modules/ui/styles.css
     }
 }
 
-/* Уведомления уже определены в common.css */
+/* Уведомления */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--color-success);
+    color: white;
+    padding: 16px 24px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    z-index: 2000;
+    animation: slideIn 0.3s ease;
+    max-width: 300px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.notification.notification--error {
+    background: var(--color-error);
+}
+
+.notification.notification--warning {
+    background: var(--color-warning);
+}
 
 modules/ui/template.html
 
@@ -1311,53 +1189,43 @@ class BudgetApp {
         this.config = MODULES_CONFIG;
         this.appContainer = document.getElementById('app');
         this.currentTab = 'main';
+        this.initialized = false;
     }
 
     async init() {
-        console.log('🚀 Budget App initializing...');
-        
+        if (this.initialized) {
+            return;
+        }
+
         try {
-            // Загружаем модули в правильном порядке
             await this.loadModulesInOrder();
-            
-            // Настраиваем взаимодействие между модулями
             this.setupModuleInteractions();
-            
-            // Настраиваем навигацию
             this.setupNavigation();
-            
-            // Показываем активную вкладку
             this.showTab(this.currentTab);
-            
-            // Скрываем лоадер
             this.hideLoader();
             
-            console.log('✅ Budget App initialized successfully');
-            
-            // Дебаг: выводим список загруженных модулей
-            console.log('📦 Loaded modules:', Object.keys(this.modules));
+            this.initialized = true;
             
         } catch (error) {
-            console.error('❌ Failed to initialize app:', error);
+            console.error('Failed to initialize app:', error);
             this.showError('Не удалось загрузить приложение');
+            this.hideLoader();
         }
     }
 
     async loadModulesInOrder() {
-        // Определяем порядок загрузки модулей (важные модули сначала)
         const loadOrder = [
-            'navigation',    // Навигация нужна первой
-            'header',        // Затем шапка
-            'ui',           // UI компоненты
-            'calendar',     // Календарь для форм
-            'operations',   // Основные операции
-            'expected-incomes', // Ожидаемые доходы
-            'plans',        // Планы
-            'chart',        // Графики
-            'settings',     // Настройки
+            'navigation',
+            'header',
+            'ui',
+            'calendar',
+            'operations',
+            'expected-incomes',
+            'plans',
+            'chart',
+            'settings',
         ];
         
-        // Загружаем модули по порядку
         for (const moduleName of loadOrder) {
             if (this.config[moduleName]) {
                 await this.loadModule(moduleName);
@@ -1366,45 +1234,26 @@ class BudgetApp {
     }
 
     async loadModule(moduleName) {
+        await this.loadModuleTemplate(moduleName);
+        await this.loadModuleStyles(moduleName);
+        
+        const modulePath = `./modules/${moduleName}/index.js`;
+        
         try {
-            console.log(`📦 Loading module: ${moduleName}`);
+            const module = await import(modulePath);
             
-            // 1. Загружаем HTML шаблон
-            await this.loadModuleTemplate(moduleName);
-            
-            // 2. Загружаем CSS стили
-            await this.loadModuleStyles(moduleName);
-            
-            // 3. Загружаем и инициализируем JavaScript
-            // ПРАВИЛЬНЫЙ ПУТЬ: относительный от корня проекта
-            const modulePath = `./modules/${moduleName}/index.js?v=${Date.now()}`;
-            
-            try {
-                const module = await import(modulePath);
+            if (module.default && typeof module.default === 'function') {
+                const ModuleClass = module.default;
+                const instance = new ModuleClass(this);
                 
-                if (module.default && typeof module.default === 'function') {
-                    // Создаем экземпляр класса и инициализируем
-                    const ModuleClass = module.default;
-                    const instance = new ModuleClass(this);
-                    
-                    // Вызываем init если он есть
-                    if (typeof instance.init === 'function') {
-                        await instance.init();
-                    }
-                    
-                    this.modules[moduleName] = instance;
-                    console.log(`✅ Module "${moduleName}" JS loaded and initialized`);
-                } else {
-                    console.log(`✅ Module "${moduleName}" template and styles loaded (no JS class)`);
+                if (typeof instance.init === 'function') {
+                    await instance.init();
                 }
-            } catch (jsError) {
-                console.warn(`⚠️ JavaScript error in module "${moduleName}":`, jsError.message);
-                console.log(`✅ Module "${moduleName}" template and styles loaded (JS skipped)`);
+                
+                this.modules[moduleName] = instance;
             }
-            
         } catch (error) {
-            console.error(`❌ Failed to load module "${moduleName}":`, error.message);
-            // Продолжаем загрузку других модулей
+            // Игнорируем ошибки загрузки JS модуля
         }
     }
 
@@ -1412,54 +1261,36 @@ class BudgetApp {
         try {
             const response = await fetch(`./modules/${moduleName}/template.html`);
             
-            if (!response.ok) {
-                throw new Error(`Template not found for module: ${moduleName}`);
+            if (response.ok) {
+                const html = await response.text();
+                
+                const moduleContainer = document.createElement('div');
+                moduleContainer.className = `module module--${moduleName}`;
+                moduleContainer.setAttribute('data-module', moduleName);
+                moduleContainer.innerHTML = html;
+                
+                this.appContainer.appendChild(moduleContainer);
             }
-            
-            const html = await response.text();
-            
-            // Создаем контейнер для модуля
-            const moduleContainer = document.createElement('div');
-            moduleContainer.className = `module module--${moduleName}`;
-            moduleContainer.setAttribute('data-module', moduleName);
-            moduleContainer.innerHTML = html;
-            
-            // Добавляем в основное приложение
-            this.appContainer.appendChild(moduleContainer);
-            
-            console.log(`📄 Template loaded for module: ${moduleName}`);
-            
         } catch (error) {
-            console.warn(`⚠️ No template found for module "${moduleName}", skipping...`);
+            // Игнорируем ошибки загрузки шаблонов
         }
     }
 
     async loadModuleStyles(moduleName) {
-        try {
+        return new Promise((resolve) => {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = `./modules/${moduleName}/styles.css`;
             link.setAttribute('data-module', moduleName);
             
-            // Ждем загрузки стилей
-            await new Promise((resolve, reject) => {
-                link.onload = resolve;
-                link.onerror = () => {
-                    console.warn(`⚠️ No styles found for module "${moduleName}"`);
-                    resolve(); // Не прерываем загрузку если стилей нет
-                };
-                document.head.appendChild(link);
-            });
+            link.onload = resolve;
+            link.onerror = resolve;
             
-            console.log(`🎨 Styles loaded for module: ${moduleName}`);
-            
-        } catch (error) {
-            console.warn(`⚠️ Error loading styles for module "${moduleName}":`, error);
-        }
+            document.head.appendChild(link);
+        });
     }
 
     setupNavigation() {
-        // Слушаем события переключения вкладок
         this.on('tab:changed', (data) => {
             if (data && data.tab) {
                 this.switchTab(data.tab);
@@ -1470,25 +1301,21 @@ class BudgetApp {
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
         
-        // Скрываем все вкладки
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
         });
         
-        // Показываем выбранную вкладку
         const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
         }
         
         this.currentTab = tabName;
-        console.log(`📱 Switched to tab: ${tabName}`);
     }
 
     showTab(tabName) {
         this.currentTab = tabName;
         
-        // Показываем соответствующую вкладку
         const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
@@ -1521,34 +1348,40 @@ class BudgetApp {
     }
 
     setupModuleInteractions() {
-        // Здесь будут настройки взаимодействия между модулями
-        console.log('🔗 Setting up module interactions...');
+        // Настройки взаимодействия между модулями
     }
 
-    // API для модулей
     getModule(name) {
         return this.modules[name];
     }
 
     emit(eventName, data) {
-        window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+        try {
+            window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+        } catch (error) {
+            console.error('Error emitting event:', error);
+        }
     }
 
     on(eventName, callback) {
-        window.addEventListener(eventName, (e) => callback(e.detail));
+        try {
+            window.addEventListener(eventName, (e) => callback(e.detail));
+        } catch (error) {
+            console.error('Error adding event listener:', error);
+        }
     }
 }
 
-// Создаем и инициализируем приложение
 const app = new BudgetApp();
 
-// Инициализируем приложение при загрузке DOM
 document.addEventListener('DOMContentLoaded', () => {
-    app.init().catch(console.error);
-    
-    // Экспортируем приложение в глобальную область для отладки
-    window.budgetApp = app;
+    app.init().catch(error => {
+        console.error('Critical app error:', error);
+        app.showError('Критическая ошибка приложения');
+    });
 });
+
+window.budgetApp = app;
 
 export default app;
 
@@ -1562,6 +1395,10 @@ index.html
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Favicon заглушка -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+    
     <title>Budget App - Планирование бюджета</title>
     
     <!-- Базовые стили -->
@@ -1585,22 +1422,6 @@ index.html
 
     <!-- Главный скрипт приложения -->
     <script type="module" src="app.js"></script>
-
-    <!-- Тестовые данные (удалить в продакшене) -->
-<script>
-    // Проверяем, есть ли уже данные
-    const hasData = localStorage.getItem('budgetOperations') || 
-                    localStorage.getItem('budgetExpectedIncomes') || 
-                    localStorage.getItem('budgetPlannedExpenses');
-    
-    if (!hasData) {
-        // Загружаем тестовые данные
-        const script = document.createElement('script');
-        script.src = 'test-data.js';
-        document.body.appendChild(script);
-    }
-</script>
-
 </body>
 </html>
 

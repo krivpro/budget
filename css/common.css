@@ -2,18 +2,201 @@
 /* ОБЩИЕ КОМПОНЕНТЫ                           */
 /* =========================================== */
 
-/* Placeholders для модулей в разработке */
+/* Основные контейнеры */
+.app-content {
+    min-height: 100vh;
+    padding-bottom: 80px; /* Для навигации */
+}
+
+.main.container {
+    margin-top: 20px;
+}
+
+/* Вкладки */
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Шапка - общие стили */
+.header {
+    background: #2A2A2A;
+    padding: 24px 16px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 16px;
+    row-gap: 24px;
+    justify-items: center;
+}
+
+.header__logo {
+    grid-column: span 3;
+    font-size: 32px;
+    color: #3B3B3B;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.header__item {
+    grid-column: span 1;
+    background: #272727;
+    padding: 20px 16px;
+    border-radius: 16px;
+    width: 100%;
+    text-align: center;
+    display: none; /* Скрыты по умолчанию */
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.header__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка планов: показываем только плановые расходы */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
+.header--plans .header__planned {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка настроек: показываем только логотип */
+.header--settings {
+    grid-template-columns: 1fr;
+}
+
+.header--settings .header__logo {
+    grid-column: span 1;
+}
+
+.header__title {
+    font-size: 12px;
+    color: #8A8A8A;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.header__sum {
+    font-size: 24px;
+    font-weight: 700;
+    color: #FFFFFF;
+    transition: color 0.3s ease;
+}
+
+/* Цвета для остатка */
+.header__balance.positive .header__sum {
+    color: #4CAF50;
+}
+
+.header__balance.negative .header__sum {
+    color: #FF7653;
+}
+
+.header__balance.neutral .header__sum {
+    color: #8A8A8A;
+}
+
+/* Цвет для ожидаемых доходов */
+.header__item.header__expected .header__sum {
+    color: #FFB74D;
+}
+
+/* Цвет для плановых расходов */
+.header__item.header__planned .header__sum {
+    color: #FF7653;
+}
+
+/* Навигация */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #2A2A2A;
+    display: flex;
+    padding: 12px 0;
+    border-top: 1px solid #333;
+}
+
+.bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #8A8A8A;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.3s ease;
+}
+
+.bottom-nav__item:hover {
+    color: #FFFFFF;
+}
+
+.bottom-nav__item.active {
+    color: #FF7653;
+}
+
+.bottom-nav__icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.bottom-nav__label {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Заглушки для модулей */
 .operations-placeholder,
 .expected-placeholder,
 .plans-placeholder,
 .chart-placeholder,
 .settings-placeholder {
-    background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    margin: var(--spacing-md);
+    background: #2A2A2A;
+    border-radius: 20px;
+    padding: 40px 20px;
+    margin: 20px 0;
     text-align: center;
-    color: var(--color-text-secondary);
+    color: #8A8A8A;
 }
 
 .operations-placeholder h3,
@@ -21,6 +204,6 @@
 .plans-placeholder h3,
 .chart-placeholder h3,
 .settings-placeholder h3 {
-    color: var(--color-text);
-    margin-bottom: var(--spacing-md);
+    color: #FFFFFF;
+    margin-bottom: 16px;
 }
