@@ -53,13 +53,29 @@ export class UIModule {
         
         document.body.appendChild(notification);
         
+        // Автоматическое удаление через 3 секунды
         setTimeout(() => {
             if (notification.parentNode) {
-                notification.remove();
+                notification.style.animation = 'slideIn 0.3s ease reverse';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
+                    }
+                }, 300);
             }
         }, 3000);
         
         return notification;
+    }
+
+    confirm(message) {
+        return new Promise((resolve) => {
+            if (window.confirm(message)) {
+                resolve(true);
+            } else {
+                resolve(false);
+            }
+        });
     }
 }
 

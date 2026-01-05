@@ -201,27 +201,516 @@ css/common.css
 /* ОБЩИЕ КОМПОНЕНТЫ                           */
 /* =========================================== */
 
-/* Placeholders для модулей в разработке */
-.operations-placeholder,
-.expected-placeholder,
-.plans-placeholder,
-.chart-placeholder,
-.settings-placeholder {
-    background: var(--color-surface);
-    border-radius: var(--radius-xl);
-    padding: var(--spacing-xl);
-    margin: var(--spacing-md);
-    text-align: center;
-    color: var(--color-text-secondary);
+/* Основные контейнеры */
+.app-content {
+    min-height: 100vh;
+    padding-bottom: 80px; /* Для навигации */
 }
 
-.operations-placeholder h3,
-.expected-placeholder h3,
-.plans-placeholder h3,
-.chart-placeholder h3,
-.settings-placeholder h3 {
-    color: var(--color-text);
-    margin-bottom: var(--spacing-md);
+.main.container {
+    margin-top: 20px;
+}
+
+/* Вкладки */
+.tab-content {
+    display: none;
+    padding: 20px;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Шапка - общие стили */
+.header {
+    background: #2A2A2A;
+    padding: 24px 16px;
+    margin-bottom: 24px;
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 16px;
+    row-gap: 24px;
+    justify-items: center;
+}
+
+.header__logo {
+    grid-column: span 3;
+    font-size: 32px;
+    color: #3B3B3B;
+    font-weight: 900;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.header__item {
+    grid-column: span 1;
+    background: #272727;
+    padding: 20px 16px;
+    border-radius: 16px;
+    width: 100%;
+    text-align: center;
+    display: none; /* Скрыты по умолчанию */
+    flex-direction: column;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+.header__item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Главная вкладка: показываем доходы, расходы, остаток */
+.header--main {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.header--main .header__income,
+.header--main .header__expenses,
+.header--main .header__balance {
+    display: flex;
+}
+
+/* Вкладка ожидаемых доходов: показываем только ожидаемые доходы */
+.header--expected {
+    grid-template-columns: 1fr;
+}
+
+.header--expected .header__expected {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка планов: показываем только плановые расходы */
+.header--plans {
+    grid-template-columns: 1fr;
+}
+
+.header--plans .header__planned {
+    display: flex;
+    grid-column: span 1;
+}
+
+/* Вкладка настроек: показываем только логотип */
+.header--settings {
+    grid-template-columns: 1fr;
+}
+
+.header--settings .header__logo {
+    grid-column: span 1;
+}
+
+.header__title {
+    font-size: 12px;
+    color: #8A8A8A;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.header__sum {
+    font-size: 24px;
+    font-weight: 700;
+    color: #FFFFFF;
+    transition: color 0.3s ease;
+}
+
+/* Цвета для остатка */
+.header__balance.positive .header__sum {
+    color: #4CAF50;
+}
+
+.header__balance.negative .header__sum {
+    color: #FF7653;
+}
+
+.header__balance.neutral .header__sum {
+    color: #8A8A8A;
+}
+
+/* Цвет для ожидаемых доходов */
+.header__item.header__expected .header__sum {
+    color: #FFB74D;
+}
+
+/* Цвет для плановых расходов */
+.header__item.header__planned .header__sum {
+    color: #FF7653;
+}
+
+/* Навигация */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #2A2A2A;
+    display: flex;
+    padding: 12px 0;
+    border-top: 1px solid #333;
+}
+
+.bottom-nav__item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    color: #8A8A8A;
+    cursor: pointer;
+    padding: 8px;
+    transition: color 0.3s ease;
+}
+
+.bottom-nav__item:hover {
+    color: #FFFFFF;
+}
+
+.bottom-nav__item.active {
+    color: #FF7653;
+}
+
+.bottom-nav__icon {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+.bottom-nav__label {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Operations - Форма добавления */
+.add {
+    background-color: #2A2A2A;
+    border-radius: 20px;
+    padding: 32px 24px;
+    margin-bottom: 32px;
+    min-height: 120px;
+}
+
+.add__input {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    background: #272727;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    padding: 18px 20px;
+    width: 100%;
+    margin-bottom: 8px;
+    color: #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+.add__input:focus {
+    border-color: #FF7653;
+    background: #2A2A2A;
+    outline: none;
+}
+
+.add__input::placeholder {
+    color: #8A8A8A;
+}
+
+.add__input.date-input {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 50px;
+}
+
+.add__btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: #FF7653;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.add__btn:hover {
+    background: #ff8a6d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 118, 83, 0.3);
+}
+
+/* Панель управления */
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.control-panel__title {
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    color: #FFFFFF;
+}
+
+.categories {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px;
+    gap: 4px;
+    background-color: #272727;
+    border-radius: 16px;
+}
+
+.categories__item {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    color: #8A8A8A;
+    white-space: nowrap;
+}
+
+.categories__item:hover {
+    background-color: rgba(255, 118, 83, 0.1);
+    color: #FF7653;
+}
+
+.categories__item.active {
+    background-color: #FF7653;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(255, 118, 83, 0.3);
+}
+
+/* Список операций */
+.list {
+    background-color: #2A2A2A;
+    border-radius: 20px;
+    padding: 32px 24px;
+    margin-bottom: 32px;
+    position: relative;
+    min-height: 120px;
+}
+
+.operation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: #272727;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.operation:hover {
+    background: #333333;
+    transform: translateX(4px);
+}
+
+.operation__info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.operation__description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.2;
+    color: #FFFFFF;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.operation__date {
+    font-size: 13px;
+    line-height: 1;
+    color: #8A8A8A;
+}
+
+.operation__amount {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    margin-left: 16px;
+    min-width: 100px;
+    text-align: right;
+}
+
+.operation__amount--income {
+    color: #4CAF50;
+}
+
+.operation__amount--expense {
+    color: #FF7653;
+}
+
+/* Пустые состояния */
+.list__no-data {
+    text-align: center;
+    color: #8A8A8A;
+    font-size: 16px;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 200px;
+}
+
+.list__no-data::before {
+    content: '';
+    width: 64px;
+    height: 64px;
+    background-color: #3B3B3B;
+    border-radius: 50%;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.7;
+    background-size: 32px 32px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.list__no-data--history::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='9' y1='9' x2='15' y2='9'%3E%3C/line%3E%3Cline x1='9' y1='15' x2='15' y2='15'%3E%3C/line%3E%3C/svg%3E");
+}
+
+.list__no-data__description {
+    font-size: 14px;
+    color: #8A8A8A;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.list__no-data__hint {
+    font-size: 13px;
+    color: #8A8A8A;
+    background: rgba(138, 138, 138, 0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+
+/* Settings Module Styles */
+.settings-content {
+    margin-top: 20px;
+}
+
+.settings-section {
+    margin-bottom: 32px;
+}
+
+.settings-section__title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #333333;
+}
+
+.settings-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #2A2A2A;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+}
+
+.settings-item:hover {
+    background: #333333;
+}
+
+.settings-item__info {
+    flex: 1;
+    min-width: 0;
+    margin-right: 16px;
+}
+
+.settings-item__title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 4px;
+}
+
+.settings-item__description {
+    font-size: 13px;
+    color: #8A8A8A;
+    line-height: 1.4;
+}
+
+.settings-btn {
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: center;
+}
+
+.settings-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.settings-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+}
+
+.settings-btn:not(:disabled):active {
+    transform: translateY(0);
+}
+
+.settings-btn--danger {
+    background: #FF7653;
+    color: #FFFFFF;
+}
+
+.settings-btn--danger:hover:not(:disabled) {
+    background: #ff8a6d;
+    box-shadow: 0 4px 12px rgba(255, 118, 83, 0.3);
+}
+
+/* Для обычных кнопок (когда добавим) */
+.settings-btn:not(.settings-btn--danger) {
+    background: #3B3B3B;
+    color: #FFFFFF;
+}
+
+.settings-btn:not(.settings-btn--danger):hover:not(:disabled) {
+    background: #444444;
 }
 
 modules/calendar/index.js
@@ -467,25 +956,75 @@ modules/calendar/template.html
 
 modules/header/index.js
 
-// Модуль шапки приложения
-
-// Модуль шапки приложения
-
+// modules/header/index.js
 class HeaderModule {
     constructor(app) {
         this.app = app;
         this.elements = null;
+        this.totals = {
+            incomeTotal: 0,
+            expenseTotal: 0,
+            expectedTotal: 0,
+            plannedTotal: 0,
+            balance: 0
+        };
     }
 
     async init() {
-        this.cacheElements();
-        this.update();
+        console.log('Header Module initialized');
+        this.createHeader();
         this.setupEventListeners();
+        this.updateHeaderForTab(this.app.getCurrentTab());
+        this.loadTotals();
+        this.update();
         return this;
     }
 
+    createHeader() {
+        const appContent = this.app.getContainer();
+        
+        const headerHTML = `
+            <header class="header container">
+                <div class="header__logo">budget</div>
+                
+                <div class="header__item header__income income">
+                    <div class="header__title">Доходы</div>
+                    <div class="income__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__expenses expenses">
+                    <div class="header__title">Расходы</div>
+                    <div class="expenses__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__balance balance">
+                    <div class="header__title">Остаток</div>
+                    <div class="balance__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__expected expected">
+                    <div class="header__title">Ожидаемые доходы</div>
+                    <div class="expected__sum header__sum sum">0,00 Р</div>
+                </div>
+                
+                <div class="header__item header__planned planned">
+                    <div class="header__title">Плановые расходы</div>
+                    <div class="planned__sum header__sum sum">0,00 Р</div>
+                </div>
+            </header>
+        `;
+        
+        const headerDiv = document.createElement('div');
+        headerDiv.innerHTML = headerHTML;
+        appContent.appendChild(headerDiv.firstElementChild);
+        
+        this.cacheElements();
+    }
+
     cacheElements() {
+        const header = document.querySelector('.header');
         this.elements = {
+            header: header,
             income: document.querySelector('.income__sum'),
             expenses: document.querySelector('.expenses__sum'),
             balance: document.querySelector('.balance__sum'),
@@ -496,84 +1035,58 @@ class HeaderModule {
     }
 
     setupEventListeners() {
-        if (this.app && this.app.on) {
-            this.app.on('tab:changed', (data) => {
+        // Слушаем событие смены вкладки
+        this.app.on('tab:changed', (data) => {
+            if (data && data.tab) {
+                console.log('Header: received tab change event:', data.tab);
                 this.updateHeaderForTab(data.tab);
-            });
-        }
-    }
-
-    updateHeaderForTab(tabName) {
-        const header = document.querySelector('.header');
-        if (!header) return;
-
-        header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
-
-        switch(tabName) {
-            case 'main':
-                header.classList.add('header--main');
-                break;
-            case 'expected':
-                header.classList.add('header--expected');
-                break;
-            case 'plans':
-                header.classList.add('header--plans');
-                break;
-            case 'settings':
-                header.classList.add('header--settings');
-                break;
-        }
-    }
-
-    calculateTotals() {
-        try {
-            const operations = JSON.parse(localStorage.getItem('budgetOperations') || '[]');
-            const expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes') || '[]');
-            const plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses') || '[]');
-            
-            let incomeTotal = 0;
-            let expensesTotal = 0;
-            let expectedTotal = 0;
-            let plannedTotal = 0;
-
-            operations.forEach(operation => {
-                if (operation.type === 'income') {
-                    incomeTotal += operation.amount || 0;
-                } else if (operation.type === 'expense') {
-                    expensesTotal += operation.amount || 0;
-                }
-            });
-
-            expectedIncomes.forEach(income => {
-                if (income.status === 'pending') {
-                    expectedTotal += income.amount || 0;
-                }
-            });
-
-            plannedExpenses.forEach(plan => {
-                if (!plan.completed) {
-                    plannedTotal += plan.amount || 0;
-                }
-            });
-
-            const balance = incomeTotal - expensesTotal;
-
-            return {
-                incomeTotal,
-                expensesTotal,
-                expectedTotal,
-                plannedTotal,
-                balance
-            };
-            
-        } catch (error) {
-            return {
+            }
+        });
+        
+        // Слушаем обновление операций
+        this.app.on('operations:updated', (data) => {
+            if (data) {
+                console.log('Header: received operations update:', data);
+                this.totals.incomeTotal = data.incomeTotal || 0;
+                this.totals.expenseTotal = data.expenseTotal || 0;
+                this.totals.balance = data.balance || 0;
+                this.update();
+            }
+        });
+        
+        // Слушаем событие очистки данных
+        this.app.on('data:cleared', () => {
+            console.log('Header: данные очищены');
+            this.totals = {
                 incomeTotal: 0,
-                expensesTotal: 0,
+                expenseTotal: 0,
                 expectedTotal: 0,
                 plannedTotal: 0,
                 balance: 0
             };
+            this.update();
+        });
+    }
+
+    loadTotals() {
+        // Загружаем операции для начального расчета
+        try {
+            const operationsData = localStorage.getItem('budgetOperations');
+            if (operationsData) {
+                const operations = JSON.parse(operationsData);
+                
+                this.totals.incomeTotal = operations
+                    .filter(op => op.type === 'income')
+                    .reduce((sum, op) => sum + (op.amount || 0), 0);
+                    
+                this.totals.expenseTotal = operations
+                    .filter(op => op.type === 'expense')
+                    .reduce((sum, op) => sum + (op.amount || 0), 0);
+                    
+                this.totals.balance = this.totals.incomeTotal - this.totals.expenseTotal;
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки totals:', error);
         }
     }
 
@@ -590,41 +1103,70 @@ class HeaderModule {
         return 'neutral';
     }
 
-    update() {
-        if (!this.elements) {
-            this.cacheElements();
+    updateHeaderForTab(tabName) {
+        if (!this.elements || !this.elements.header) {
+            console.log('Header: elements not found');
+            return;
         }
         
-        const totals = this.calculateTotals();
+        console.log('Header: updating for tab:', tabName);
         
+        // Убираем все классы состояний
+        this.elements.header.classList.remove('header--main', 'header--expected', 'header--plans', 'header--settings');
+        
+        // Добавляем класс для текущей вкладки
+        switch(tabName) {
+            case 'main':
+                this.elements.header.classList.add('header--main');
+                break;
+            case 'expected':
+                this.elements.header.classList.add('header--expected');
+                break;
+            case 'plans':
+                this.elements.header.classList.add('header--plans');
+                break;
+            case 'settings':
+                this.elements.header.classList.add('header--settings');
+                break;
+        }
+        
+        console.log('Header classes:', this.elements.header.className);
+    }
+
+    update() {
+        if (!this.elements) return;
+        
+        // Обновляем значения
         if (this.elements.income) {
-            this.elements.income.textContent = `${this.formatCurrency(totals.incomeTotal)} Р`;
+            this.elements.income.textContent = `${this.formatCurrency(this.totals.incomeTotal)} Р`;
         }
         
         if (this.elements.expenses) {
-            this.elements.expenses.textContent = `${this.formatCurrency(totals.expensesTotal)} Р`;
+            this.elements.expenses.textContent = `${this.formatCurrency(this.totals.expenseTotal)} Р`;
         }
         
         if (this.elements.expected) {
-            this.elements.expected.textContent = `${this.formatCurrency(totals.expectedTotal)} Р`;
+            this.elements.expected.textContent = `${this.formatCurrency(this.totals.expectedTotal)} Р`;
         }
         
         if (this.elements.planned) {
-            this.elements.planned.textContent = `${this.formatCurrency(totals.plannedTotal)} Р`;
+            this.elements.planned.textContent = `${this.formatCurrency(this.totals.plannedTotal)} Р`;
         }
         
         if (this.elements.balance) {
-            const balanceText = totals.balance > 0 
-                ? `+${this.formatCurrency(totals.balance)} Р`
-                : `${this.formatCurrency(totals.balance)} Р`;
+            const balanceText = this.totals.balance > 0 
+                ? `+${this.formatCurrency(this.totals.balance)} Р`
+                : `${this.formatCurrency(this.totals.balance)} Р`;
             
             this.elements.balance.textContent = balanceText;
             
             if (this.elements.balanceContainer) {
                 this.elements.balanceContainer.classList.remove('positive', 'negative', 'neutral');
-                this.elements.balanceContainer.classList.add(this.getBalanceClass(totals.balance));
+                this.elements.balanceContainer.classList.add(this.getBalanceClass(this.totals.balance));
             }
         }
+        
+        console.log('Header updated with totals:', this.totals);
     }
 }
 
@@ -1084,15 +1626,707 @@ modules/navigation/template.html
     </button>
 </nav>
 
-modules/ui/index.js
+modules/operations/index.js
 
-// Модуль общих UI компонентов
-export class UIModule {
+// modules/operations/index.js
+import { OperationsStorage } from './storage.js';
+
+class OperationsModule {
+    constructor(app) {
+        this.app = app;
+        this.operations = [];
+        this.currentFilter = 'all';
+    }
+
+    async init() {
+        console.log('Operations Module initialized');
+        this.operations = OperationsStorage.getOperations();
+        
+        // Проверяем данные
+        console.log('Загружено операций:', this.operations.length);
+        if (this.operations.length > 0) {
+            console.log('Пример операции:', this.operations[0]);
+        }
+        
+        this.createTabContent();
+        this.setupEventListeners();
+        this.renderOperations();
+        this.updateStats();
+        return this;
+    }
+
+    createTabContent() {
+        const appContent = this.app.getContainer();
+        
+        let tabContent = appContent.querySelector('.tab-content[data-tab="main"]');
+        
+        if (!tabContent) {
+            tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+            tabContent.dataset.tab = 'main';
+            appContent.appendChild(tabContent);
+        }
+        
+        if (this.app.getCurrentTab() === 'main') {
+            tabContent.classList.add('active');
+        }
+        
+        tabContent.innerHTML = `
+            <div class="operations-content">
+                <!-- Форма добавления операции -->
+                <div class="add">
+                    <div class="control-panel">
+                        <h2 class="control-panel__title">Добавить операцию</h2>
+                        <div class="control-panel__categories categories">
+                            <div class="categories__item active" data-type="income">Доходы</div>
+                            <div class="categories__item" data-type="expense">Расходы</div>
+                        </div>
+                    </div>
+                    
+                    <input type="text" class="add__input" id="amountInput" placeholder="Сумма" inputmode="decimal">
+                    
+                    <input type="text" class="add__input" id="descriptionInput" placeholder="Описание" maxlength="100">
+                    
+                    <input type="text" class="add__input date-input" id="dateInput" placeholder="Выберите дату" readonly>
+                    <input type="date" id="realDateInput" class="visually-hidden">
+                    
+                    <a href="#" class="add__btn" id="addBtn">+ Добавить операцию</a> 
+                </div>
+                
+                <!-- История операций -->
+                <div class="list history">
+                    <div class="control-panel">
+                        <h2 class="control-panel__title">Список операций</h2>
+                        <div class="control-panel__categories categories">
+                            <div class="categories__item active" data-filter="all">Все</div>
+                            <div class="categories__item" data-filter="income">Доходы</div>
+                            <div class="categories__item" data-filter="expense">Расходы</div>
+                        </div>
+                    </div>
+                    <div class="history-content">
+                        <!-- Операции будут здесь -->
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('✅ Operations tab content created');
+    }
+
+    setupEventListeners() {
+        // Кнопка добавления операции
+        setTimeout(() => {
+            const addBtn = document.getElementById('addBtn');
+            if (addBtn) {
+                addBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleAddOperation();
+                });
+            }
+            
+            // Переключение типа операции (доход/расход)
+            const categoryItems = document.querySelectorAll('.add .categories__item');
+            categoryItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    categoryItems.forEach(i => i.classList.remove('active'));
+                    item.classList.add('active');
+                });
+            });
+            
+            // Фильтры в истории
+            const filterItems = document.querySelectorAll('.history .categories__item');
+            filterItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const filter = item.dataset.filter;
+                    this.filterOperations(filter);
+                });
+            });
+            
+            // Поле даты - устанавливаем сегодняшнюю дату по умолчанию
+            const dateInput = document.getElementById('dateInput');
+            const realDateInput = document.getElementById('realDateInput');
+            
+            if (dateInput && realDateInput) {
+                this.setTodayDate(); // Устанавливаем сегодняшнюю дату
+                
+                dateInput.addEventListener('click', () => {
+                    // TODO: Открыть календарь
+                    this.showCalendarModal();
+                });
+            }
+            
+            // Валидация суммы при вводе
+            const amountInput = document.getElementById('amountInput');
+            if (amountInput) {
+                amountInput.addEventListener('input', (e) => {
+                    this.validateAmountInput(e.target);
+                });
+            }
+            
+            // Добавление по Enter в поле описания
+            const descriptionInput = document.getElementById('descriptionInput');
+            if (descriptionInput) {
+                descriptionInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.handleAddOperation();
+                    }
+                });
+            }
+            
+            // Слушаем событие очистки данных
+            this.app.on('data:cleared', () => {
+                console.log('Operations: данные очищены');
+                this.operations = [];
+                this.renderOperations();
+                this.updateStats();
+            });
+        }, 100);
+    }
+
+    handleAddOperation() {
+        // Получаем значения из формы
+        const amountInput = document.getElementById('amountInput');
+        const descriptionInput = document.getElementById('descriptionInput');
+        const realDateInput = document.getElementById('realDateInput');
+        
+        const amountText = amountInput.value.replace(',', '.');
+        const amount = parseFloat(amountText);
+        const description = descriptionInput.value.trim();
+        const date = realDateInput.value;
+        
+        console.log('Добавление операции:', { amount, description, date });
+        
+        // Валидация
+        if (!amount || amount <= 0 || isNaN(amount)) {
+            this.showError('Пожалуйста, введите корректную сумму');
+            amountInput.focus();
+            return;
+        }
+        
+        if (!description) {
+            this.showError('Пожалуйста, введите описание');
+            descriptionInput.focus();
+            return;
+        }
+        
+        if (!date) {
+            this.showError('Пожалуйста, выберите дату');
+            document.getElementById('dateInput').focus();
+            return;
+        }
+        
+        // Определяем тип операции
+        const activeType = document.querySelector('.add .categories__item.active');
+        const type = activeType ? activeType.dataset.type : 'income';
+        
+        // Создаём операцию
+        const operation = {
+            id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+            type: type,
+            amount: parseFloat(amount.toFixed(2)),
+            description: description,
+            date: date,
+            createdAt: new Date().toISOString()
+        };
+        
+        console.log('Создана операция:', operation);
+        
+        // Добавляем в массив
+        this.operations.push(operation);
+        
+        // Сохраняем
+        OperationsStorage.saveOperations(this.operations);
+        
+        // Показываем уведомление
+        this.showSuccess(`${type === 'income' ? 'Доход' : 'Расход'} "${description}" добавлен`);
+        
+        // Очищаем форму
+        amountInput.value = '';
+        descriptionInput.value = '';
+        // Дата остаётся сегодняшней
+        
+        // Обновляем UI
+        this.renderOperations();
+        this.updateStats();
+        
+        // Уведомляем другие модули
+        this.app.emit('operation:added', operation);
+    }
+
+    filterOperations(filterType) {
+        this.currentFilter = filterType;
+        
+        // Обновляем активный фильтр
+        const filterItems = document.querySelectorAll('.history .categories__item');
+        filterItems.forEach(item => {
+            if (item.dataset.filter === filterType) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+        
+        this.renderOperations();
+    }
+
+    renderOperations() {
+        const historyContent = document.querySelector('.history-content');
+        if (!historyContent) return;
+        
+        // Фильтруем операции
+        let filteredOps = this.operations;
+        if (this.currentFilter !== 'all') {
+            filteredOps = this.operations.filter(op => op.type === this.currentFilter);
+        }
+        
+        console.log('Отображаем операций:', filteredOps.length);
+        
+        if (filteredOps.length === 0) {
+            const message = this.currentFilter === 'all' 
+                ? 'Операций пока нет' 
+                : this.currentFilter === 'income' 
+                    ? 'Нет доходов' 
+                    : 'Нет расходов';
+                    
+            const hint = this.currentFilter === 'all' 
+                ? 'Добавьте первую операцию в форме выше'
+                : 'Переключитесь на "Все" или попробуйте другой фильтр';
+            
+            historyContent.innerHTML = `
+                <div class="list__no-data list__no-data--history">
+                    <div class="list__no-data__description">${message}</div>
+                    <div class="list__no-data__hint">${hint}</div>
+                </div>
+            `;
+            return;
+        }
+        
+        // Сортируем по дате (новые сверху), а при одинаковой дате - по времени создания
+        filteredOps.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            const dateDiff = dateB - dateA;
+            
+            if (dateDiff !== 0) {
+                return dateDiff;
+            }
+            
+            const createdAtA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const createdAtB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return createdAtB - createdAtA;
+        });
+        
+        // Рендерим
+        historyContent.innerHTML = filteredOps.map(op => this.renderOperation(op)).join('');
+    }
+
+    renderOperation(operation) {
+        // Проверяем структуру операции
+        if (!operation || typeof operation !== 'object') {
+            console.error('Некорректная операция:', operation);
+            return '';
+        }
+        
+        // Безопасное получение данных
+        const type = operation.type || 'income';
+        const amount = operation.amount || 0;
+        const description = operation.description || 'Без описания';
+        const date = operation.date || new Date().toISOString().split('T')[0];
+        
+        // Форматируем дату
+        let formattedDate;
+        try {
+            const dateObj = new Date(date);
+            formattedDate = dateObj.toLocaleDateString('ru-RU');
+        } catch (e) {
+            formattedDate = 'Некорректная дата';
+        }
+        
+        // Форматируем сумму
+        const amountFormatted = amount.toFixed(2).replace('.', ',');
+        
+        return `
+            <div class="operation" data-id="${operation.id || Date.now()}">
+                <div class="operation__info">
+                    <p class="operation__description">${this.escapeHtml(description)}</p>
+                    <p class="operation__date">${formattedDate}</p>
+                </div>
+                <p class="operation__amount ${type === 'income' ? 'operation__amount--income' : 'operation__amount--expense'}">
+                    ${type === 'income' ? '+' : '-'}${amountFormatted} Р
+                </p>
+            </div>
+        `;
+    }
+
+    updateStats() {
+        // Считаем общие суммы
+        const incomeTotal = this.operations
+            .filter(op => op.type === 'income')
+            .reduce((sum, op) => sum + (op.amount || 0), 0);
+            
+        const expenseTotal = this.operations
+            .filter(op => op.type === 'expense')
+            .reduce((sum, op) => sum + (op.amount || 0), 0);
+        
+        const balance = incomeTotal - expenseTotal;
+        
+        console.log('Статистика:', { 
+            incomeTotal, 
+            expenseTotal, 
+            balance,
+            operationsCount: this.operations.length 
+        });
+        
+        // Уведомляем HeaderModule об обновлении
+        this.app.emit('operations:updated', {
+            incomeTotal,
+            expenseTotal,
+            balance
+        });
+    }
+
+    setTodayDate() {
+        const today = new Date();
+        const formattedDate = today.toLocaleDateString('ru-RU');
+        const dateString = today.toISOString().split('T')[0];
+        
+        const dateInput = document.getElementById('dateInput');
+        const realDateInput = document.getElementById('realDateInput');
+        
+        if (dateInput) dateInput.value = formattedDate;
+        if (realDateInput) realDateInput.value = dateString;
+    }
+
+    showCalendarModal() {
+        // Временное решение - показываем alert
+        alert('Календарь будет добавлен позже. Дата установлена на сегодня.');
+        this.setTodayDate();
+    }
+
+    validateAmountInput(input) {
+        // Очищаем от всех символов кроме цифр и точки/запятой
+        let value = input.value.replace(/[^\d,\.]/g, '');
+        
+        // Заменяем запятую на точку
+        value = value.replace(',', '.');
+        
+        // Удаляем лишние точки
+        const parts = value.split('.');
+        if (parts.length > 2) {
+            value = parts[0] + '.' + parts.slice(1).join('');
+        }
+        
+        // Ограничиваем до 2 знаков после запятой
+        if (parts.length === 2 && parts[1].length > 2) {
+            value = parts[0] + '.' + parts[1].substring(0, 2);
+        }
+        
+        input.value = value;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    showError(message) {
+        const uiModule = this.app.getModule('ui');
+        if (uiModule && uiModule.showNotification) {
+            uiModule.showNotification(message, 'error');
+        } else {
+            alert(message);
+        }
+    }
+
+    showSuccess(message) {
+        const uiModule = this.app.getModule('ui');
+        if (uiModule && uiModule.showNotification) {
+            uiModule.showNotification(message, 'success');
+        }
+    }
+}
+
+export default OperationsModule;
+
+modules/settings/index.js
+
+// modules/settings/index.js
+class SettingsModule {
     constructor(app) {
         this.app = app;
     }
 
     async init() {
+        console.log('Settings Module initialized');
+        this.createTabContent();
+        this.setupEventListeners();
+        return this;
+    }
+
+    createTabContent() {
+        const appContent = this.app.getContainer();
+        
+        let tabContent = appContent.querySelector('.tab-content[data-tab="settings"]');
+        
+        if (!tabContent) {
+            tabContent = document.createElement('div');
+            tabContent.className = 'tab-content';
+            tabContent.dataset.tab = 'settings';
+            appContent.appendChild(tabContent);
+        }
+        
+        tabContent.innerHTML = `
+            <div class="settings-content">
+                <div class="list settings">
+                    <div class="control-panel">
+                        <h2 class="control-panel__title">Настройки</h2>
+                    </div>
+                    
+                    <div class="settings-content">
+                        <!-- Раздел данных -->
+                        <div class="settings-section">
+                            <h3 class="settings-section__title">Данные</h3>
+                            
+                            <!-- Статистика данных -->
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Статистика данных</div>
+                                    <div class="settings-item__description" id="dataStats">
+                                        Загрузка...
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Очистка всех данных -->
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Очистить все данные</div>
+                                    <div class="settings-item__description">
+                                        Удалить все операции, ожидаемые доходы и плановые расходы. Это действие нельзя отменить.
+                                    </div>
+                                </div>
+                                <button class="settings-btn settings-btn--danger" id="clearAllDataBtn">
+                                    Очистить
+                                </button>
+                            </div>
+                            
+                            <!-- Экспорт данных (будет позже) -->
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Экспорт данных</div>
+                                    <div class="settings-item__description">
+                                        Сохранить все данные в файл (будет добавлено позже)
+                                    </div>
+                                </div>
+                                <button class="settings-btn" id="exportDataBtn" disabled>
+                                    Экспорт
+                                </button>
+                            </div>
+                            
+                            <!-- Импорт данных (будет позже) -->
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Импорт данных</div>
+                                    <div class="settings-item__description">
+                                        Загрузить данные из файла (будет добавлено позже)
+                                    </div>
+                                </div>
+                                <button class="settings-btn" id="importDataBtn" disabled>
+                                    Импорт
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Раздел о приложении -->
+                        <div class="settings-section">
+                            <h3 class="settings-section__title">О приложении</h3>
+                            
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Версия</div>
+                                    <div class="settings-item__description">
+                                        Budget App v2.0 (модульная версия)
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Разработчик</div>
+                                    <div class="settings-item__description">
+                                        Модульная архитектура с независимыми компонентами
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="settings-item">
+                                <div class="settings-item__info">
+                                    <div class="settings-item__title">Оптимизировано для мобильных</div>
+                                    <div class="settings-item__description">
+                                        Адаптивный дизайн для всех устройств
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        console.log('✅ Settings tab content created');
+        
+        // Обновляем статистику данных
+        setTimeout(() => this.updateDataStats(), 100);
+    }
+
+    setupEventListeners() {
+        setTimeout(() => {
+            // Кнопка очистки данных
+            const clearBtn = document.getElementById('clearAllDataBtn');
+            if (clearBtn) {
+                clearBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.handleClearAllData();
+                });
+            }
+            
+            // Кнопки экспорта/импорта (пока отключены)
+            const exportBtn = document.getElementById('exportDataBtn');
+            const importBtn = document.getElementById('importDataBtn');
+            
+            if (exportBtn) {
+                exportBtn.title = 'Функция будет добавлена в будущем';
+            }
+            
+            if (importBtn) {
+                importBtn.title = 'Функция будет добавлена в будущем';
+            }
+        }, 100);
+    }
+
+    updateDataStats() {
+        const statsElement = document.getElementById('dataStats');
+        if (!statsElement) return;
+        
+        try {
+            // Получаем данные из localStorage
+            const operations = JSON.parse(localStorage.getItem('budgetOperations') || '[]');
+            const expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes') || '[]');
+            const plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses') || '[]');
+            
+            const totalItems = operations.length + expectedIncomes.length + plannedExpenses.length;
+            
+            if (totalItems === 0) {
+                statsElement.textContent = 'Нет сохраненных данных';
+                return;
+            }
+            
+            // Форматируем статистику
+            const stats = [];
+            
+            if (operations.length > 0) {
+                const incomeCount = operations.filter(op => op.type === 'income').length;
+                const expenseCount = operations.filter(op => op.type === 'expense').length;
+                stats.push(`Операции: ${operations.length} (${incomeCount} доходов, ${expenseCount} расходов)`);
+            }
+            
+            if (expectedIncomes.length > 0) {
+                const pendingCount = expectedIncomes.filter(inc => inc.status === 'pending').length;
+                stats.push(`Ожидаемые доходы: ${expectedIncomes.length} (${pendingCount} ожидают)`);
+            }
+            
+            if (plannedExpenses.length > 0) {
+                const activeCount = plannedExpenses.filter(plan => !plan.completed).length;
+                stats.push(`Плановые расходы: ${plannedExpenses.length} (${activeCount} активны)`);
+            }
+            
+            statsElement.textContent = stats.join(' • ');
+            
+        } catch (error) {
+            console.error('Ошибка при получении статистики данных:', error);
+            statsElement.textContent = 'Ошибка загрузки статистики';
+        }
+    }
+
+    async handleClearAllData() {
+        // Получаем UI модуль для уведомлений
+        const uiModule = this.app.getModule('ui');
+        
+        // Проверяем, есть ли данные для очистки
+        const operations = JSON.parse(localStorage.getItem('budgetOperations') || '[]');
+        const expectedIncomes = JSON.parse(localStorage.getItem('budgetExpectedIncomes') || '[]');
+        const plannedExpenses = JSON.parse(localStorage.getItem('budgetPlannedExpenses') || '[]');
+        
+        const totalItems = operations.length + expectedIncomes.length + plannedExpenses.length;
+        
+        if (totalItems === 0) {
+            if (uiModule && uiModule.showNotification) {
+                uiModule.showNotification('Нет данных для очистки', 'error');
+            } else {
+                alert('Нет данных для очистки');
+            }
+            return;
+        }
+        
+        // Подтверждение
+        const confirmed = confirm(
+            `Вы уверены, что хотите удалить ВСЕ данные?\n\n` +
+            `Будет удалено:\n` +
+            `• ${operations.length} операций\n` +
+            `• ${expectedIncomes.length} ожидаемых доходов\n` +
+            `• ${plannedExpenses.length} плановых расходов\n\n` +
+            `Это действие нельзя отменить!`
+        );
+        
+        if (!confirmed) {
+            return;
+        }
+        
+        try {
+            // Очищаем все данные
+            localStorage.removeItem('budgetOperations');
+            localStorage.removeItem('budgetExpectedIncomes');
+            localStorage.removeItem('budgetPlannedExpenses');
+            
+            // Показываем уведомление об успехе
+            if (uiModule && uiModule.showNotification) {
+                uiModule.showNotification('Все данные успешно удалены', 'success');
+            }
+            
+            // Обновляем статистику
+            this.updateDataStats();
+            
+            // Уведомляем другие модули об очистке
+            this.app.emit('data:cleared', {});
+            
+            console.log('✅ Все данные очищены');
+            
+        } catch (error) {
+            console.error('Ошибка при очистке данных:', error);
+            
+            if (uiModule && uiModule.showNotification) {
+                uiModule.showNotification('Ошибка при очистке данных', 'error');
+            }
+        }
+    }
+}
+
+export default SettingsModule;
+
+modules/ui/index.js
+
+// modules/ui/index.js
+export class UIModule {
+    constructor(app) {
+        this.app = app;
+        this.notifications = [];
+    }
+
+    async init() {
+        console.log('UI Module initialized');
         return this;
     }
 
@@ -1101,8 +2335,45 @@ export class UIModule {
         notification.className = `notification notification--${type}`;
         notification.textContent = message;
         
+        // Стили для уведомления
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: ${type === 'success' ? '#4CAF50' : '#FF7653'};
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+            max-width: 300px;
+            font-size: 14px;
+            font-weight: 500;
+        `;
+        
+        // Добавляем стили для анимации если их нет
+        if (!document.querySelector('#notification-styles')) {
+            const style = document.createElement('style');
+            style.id = 'notification-styles';
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        opacity: 0;
+                        transform: translateY(10px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translateY(0);
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
         document.body.appendChild(notification);
         
+        // Автоматическое удаление через 3 секунды
         setTimeout(() => {
             if (notification.parentNode) {
                 notification.style.animation = 'slideIn 0.3s ease reverse';
@@ -1119,7 +2390,7 @@ export class UIModule {
 
     confirm(message) {
         return new Promise((resolve) => {
-            if (confirm(message)) {
+            if (window.confirm(message)) {
                 resolve(true);
             } else {
                 resolve(false);

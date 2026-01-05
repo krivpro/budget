@@ -144,6 +144,14 @@ class OperationsModule {
                     }
                 });
             }
+            
+            // Слушаем событие очистки данных
+            this.app.on('data:cleared', () => {
+                console.log('Operations: данные очищены');
+                this.operations = [];
+                this.renderOperations();
+                this.updateStats();
+            });
         }, 100);
     }
 

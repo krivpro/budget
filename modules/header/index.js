@@ -95,6 +95,19 @@ class HeaderModule {
                 this.update();
             }
         });
+        
+        // Слушаем событие очистки данных
+        this.app.on('data:cleared', () => {
+            console.log('Header: данные очищены');
+            this.totals = {
+                incomeTotal: 0,
+                expenseTotal: 0,
+                expectedTotal: 0,
+                plannedTotal: 0,
+                balance: 0
+            };
+            this.update();
+        });
     }
 
     loadTotals() {
