@@ -207,3 +207,234 @@
     color: #FFFFFF;
     margin-bottom: 16px;
 }
+
+/* Operations - Форма добавления */
+.add {
+    background-color: #2A2A2A;
+    border-radius: 20px;
+    padding: 32px 24px;
+    margin-bottom: 32px;
+    min-height: 120px;
+}
+
+.add__input {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 1.5;
+    background: #272727;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    padding: 18px 20px;
+    width: 100%;
+    margin-bottom: 8px;
+    color: #FFFFFF;
+    transition: all 0.3s ease;
+}
+
+.add__input:focus {
+    border-color: #FF7653;
+    background: #2A2A2A;
+    outline: none;
+}
+
+.add__input::placeholder {
+    color: #8A8A8A;
+}
+
+.add__input.date-input {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='16' y1='2' x2='16' y2='6'%3E%3C/line%3E%3Cline x1='8' y1='2' x2='8' y2='6'%3E%3C/line%3E%3Cline x1='3' y1='10' x2='21' y2='10'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 20px center;
+    padding-right: 50px;
+}
+
+.add__btn {
+    display: block;
+    width: 100%;
+    padding: 18px;
+    background: #FF7653;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    border: none;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+    color: #FFFFFF;
+    text-decoration: none;
+}
+
+.add__btn:hover {
+    background: #ff8a6d;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 118, 83, 0.3);
+}
+
+/* Панель управления */
+.control-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.control-panel__title {
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 1;
+    color: #FFFFFF;
+}
+
+.categories {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 4px;
+    gap: 4px;
+    background-color: #272727;
+    border-radius: 16px;
+}
+
+.categories__item {
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    background: transparent;
+    color: #8A8A8A;
+    white-space: nowrap;
+}
+
+.categories__item:hover {
+    background-color: rgba(255, 118, 83, 0.1);
+    color: #FF7653;
+}
+
+.categories__item.active {
+    background-color: #FF7653;
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(255, 118, 83, 0.3);
+}
+
+/* Список операций */
+.list {
+    background-color: #2A2A2A;
+    border-radius: 20px;
+    padding: 32px 24px;
+    margin-bottom: 32px;
+    position: relative;
+    min-height: 120px;
+}
+
+.operation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    background: #272727;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+}
+
+.operation:hover {
+    background: #333333;
+    transform: translateX(4px);
+}
+
+.operation__info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+
+.operation__description {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 1.2;
+    color: #FFFFFF;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.operation__date {
+    font-size: 13px;
+    line-height: 1;
+    color: #8A8A8A;
+}
+
+.operation__amount {
+    font-weight: 700;
+    font-size: 16px;
+    line-height: 1;
+    margin-left: 16px;
+    min-width: 100px;
+    text-align: right;
+}
+
+.operation__amount--income {
+    color: #4CAF50;
+}
+
+.operation__amount--expense {
+    color: #FF7653;
+}
+
+/* Пустые состояния */
+.list__no-data {
+    text-align: center;
+    color: #8A8A8A;
+    font-size: 16px;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    min-height: 200px;
+}
+
+.list__no-data::before {
+    content: '';
+    width: 64px;
+    height: 64px;
+    background-color: #3B3B3B;
+    border-radius: 50%;
+    display: block;
+    margin-bottom: 8px;
+    opacity: 0.7;
+    background-size: 32px 32px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.list__no-data--history::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238A8A8A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='3' width='18' height='18' rx='2' ry='2'%3E%3C/rect%3E%3Cline x1='9' y1='9' x2='15' y2='9'%3E%3C/line%3E%3Cline x1='9' y1='15' x2='15' y2='15'%3E%3C/line%3E%3C/svg%3E");
+}
+
+.list__no-data__description {
+    font-size: 14px;
+    color: #8A8A8A;
+    max-width: 300px;
+    line-height: 1.5;
+}
+
+.list__no-data__hint {
+    font-size: 13px;
+    color: #8A8A8A;
+    background: rgba(138, 138, 138, 0.1);
+    padding: 8px 16px;
+    border-radius: 8px;
+    margin-top: 8px;
+}

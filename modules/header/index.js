@@ -3,6 +3,13 @@ class HeaderModule {
     constructor(app) {
         this.app = app;
         this.elements = null;
+        this.totals = {
+            incomeTotal: 0,
+            expenseTotal: 0,
+            expectedTotal: 0,
+            plannedTotal: 0,
+            balance: 0
+        };
     }
 
     async init() {
@@ -10,6 +17,7 @@ class HeaderModule {
         this.createHeader();
         this.setupEventListeners();
         this.updateHeaderForTab(this.app.getCurrentTab());
+        this.loadTotals();
         this.update();
         return this;
     }
@@ -76,6 +84,52 @@ class HeaderModule {
                 this.updateHeaderForTab(data.tab);
             }
         });
+        
+        // Слушаем обновление операций
+        this.app.on('operations:updated', (data) => {
+            if (data) {
+                console.log('Header: received operations update:', data);
+                this.totals.incomeTotal = data.incomeTotal || 0;
+                this.totals.expenseTotal = data.expenseTotal || 0;
+                this.totals.balance = data.balance || 0;
+                this.update();
+            }
+        });
+    }
+
+    loadTotals() {
+        // Загружаем операции для начального расчета
+        try {
+            const operationsData = localStorage.getItem('budgetOperations');
+            if (operationsData) {
+                const operations = JSON.parse(operationsData);
+                
+                this.totals.incomeTotal = operations
+                    .filter(op => op.type === 'income')
+                    .reduce((sum, op) => sum + (op.amount || 0), 0);
+                    
+                this.totals.expenseTotal = operations
+                    .filter(op => op.type === 'expense')
+                    .reduce((sum, op) => sum + (op.amount || 0), 0);
+                    
+                this.totals.balance = this.totals.incomeTotal - this.totals.expenseTotal;
+            }
+        } catch (error) {
+            console.error('Ошибка загрузки totals:', error);
+        }
+    }
+
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('ru-RU', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
+
+    getBalanceClass(balance) {
+        if (balance > 0) return 'positive';
+        if (balance < 0) return 'negative';
+        return 'neutral';
     }
 
     updateHeaderForTab(tabName) {
@@ -111,12 +165,37 @@ class HeaderModule {
     update() {
         if (!this.elements) return;
         
-        // Заглушка - всегда показывает 0
-        if (this.elements.income) this.elements.income.textContent = '0,00 Р';
-        if (this.elements.expenses) this.elements.expenses.textContent = '0,00 Р';
-        if (this.elements.expected) this.elements.expected.textContent = '0,00 Р';
-        if (this.elements.planned) this.elements.planned.textContent = '0,00 Р';
-        if (this.elements.balance) this.elements.balance.textContent = '0,00 Р';
+        // Обновляем значения
+        if (this.elements.income) {
+            this.elements.income.textContent = `${this.formatCurrency(this.totals.incomeTotal)} Р`;
+        }
+        
+        if (this.elements.expenses) {
+            this.elements.expenses.textContent = `${this.formatCurrency(this.totals.expenseTotal)} Р`;
+        }
+        
+        if (this.elements.expected) {
+            this.elements.expected.textContent = `${this.formatCurrency(this.totals.expectedTotal)} Р`;
+        }
+        
+        if (this.elements.planned) {
+            this.elements.planned.textContent = `${this.formatCurrency(this.totals.plannedTotal)} Р`;
+        }
+        
+        if (this.elements.balance) {
+            const balanceText = this.totals.balance > 0 
+                ? `+${this.formatCurrency(this.totals.balance)} Р`
+                : `${this.formatCurrency(this.totals.balance)} Р`;
+            
+            this.elements.balance.textContent = balanceText;
+            
+            if (this.elements.balanceContainer) {
+                this.elements.balanceContainer.classList.remove('positive', 'negative', 'neutral');
+                this.elements.balanceContainer.classList.add(this.getBalanceClass(this.totals.balance));
+            }
+        }
+        
+        console.log('Header updated with totals:', this.totals);
     }
 }
 
