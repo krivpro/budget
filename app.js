@@ -7,53 +7,43 @@ class BudgetApp {
         this.config = MODULES_CONFIG;
         this.appContainer = document.getElementById('app');
         this.currentTab = 'main';
+        this.initialized = false;
     }
 
     async init() {
-        console.log('🚀 Budget App initializing...');
-        
+        if (this.initialized) {
+            return;
+        }
+
         try {
-            // Загружаем модули в правильном порядке
             await this.loadModulesInOrder();
-            
-            // Настраиваем взаимодействие между модулями
             this.setupModuleInteractions();
-            
-            // Настраиваем навигацию
             this.setupNavigation();
-            
-            // Показываем активную вкладку
             this.showTab(this.currentTab);
-            
-            // Скрываем лоадер
             this.hideLoader();
             
-            console.log('✅ Budget App initialized successfully');
-            
-            // Дебаг: выводим список загруженных модулей
-            console.log('📦 Loaded modules:', Object.keys(this.modules));
+            this.initialized = true;
             
         } catch (error) {
-            console.error('❌ Failed to initialize app:', error);
+            console.error('Failed to initialize app:', error);
             this.showError('Не удалось загрузить приложение');
+            this.hideLoader();
         }
     }
 
     async loadModulesInOrder() {
-        // Определяем порядок загрузки модулей (важные модули сначала)
         const loadOrder = [
-            'navigation',    // Навигация нужна первой
-            'header',        // Затем шапка
-            'ui',           // UI компоненты
-            'calendar',     // Календарь для форм
-            'operations',   // Основные операции
-            'expected-incomes', // Ожидаемые доходы
-            'plans',        // Планы
-            'chart',        // Графики
-            'settings',     // Настройки
+            'navigation',
+            'header',
+            'ui',
+            'calendar',
+            'operations',
+            'expected-incomes',
+            'plans',
+            'chart',
+            'settings',
         ];
         
-        // Загружаем модули по порядку
         for (const moduleName of loadOrder) {
             if (this.config[moduleName]) {
                 await this.loadModule(moduleName);
@@ -62,45 +52,26 @@ class BudgetApp {
     }
 
     async loadModule(moduleName) {
+        await this.loadModuleTemplate(moduleName);
+        await this.loadModuleStyles(moduleName);
+        
+        const modulePath = `./modules/${moduleName}/index.js`;
+        
         try {
-            console.log(`📦 Loading module: ${moduleName}`);
+            const module = await import(modulePath);
             
-            // 1. Загружаем HTML шаблон
-            await this.loadModuleTemplate(moduleName);
-            
-            // 2. Загружаем CSS стили
-            await this.loadModuleStyles(moduleName);
-            
-            // 3. Загружаем и инициализируем JavaScript
-            // ПРАВИЛЬНЫЙ ПУТЬ: относительный от корня проекта
-            const modulePath = `./modules/${moduleName}/index.js?v=${Date.now()}`;
-            
-            try {
-                const module = await import(modulePath);
+            if (module.default && typeof module.default === 'function') {
+                const ModuleClass = module.default;
+                const instance = new ModuleClass(this);
                 
-                if (module.default && typeof module.default === 'function') {
-                    // Создаем экземпляр класса и инициализируем
-                    const ModuleClass = module.default;
-                    const instance = new ModuleClass(this);
-                    
-                    // Вызываем init если он есть
-                    if (typeof instance.init === 'function') {
-                        await instance.init();
-                    }
-                    
-                    this.modules[moduleName] = instance;
-                    console.log(`✅ Module "${moduleName}" JS loaded and initialized`);
-                } else {
-                    console.log(`✅ Module "${moduleName}" template and styles loaded (no JS class)`);
+                if (typeof instance.init === 'function') {
+                    await instance.init();
                 }
-            } catch (jsError) {
-                console.warn(`⚠️ JavaScript error in module "${moduleName}":`, jsError.message);
-                console.log(`✅ Module "${moduleName}" template and styles loaded (JS skipped)`);
+                
+                this.modules[moduleName] = instance;
             }
-            
         } catch (error) {
-            console.error(`❌ Failed to load module "${moduleName}":`, error.message);
-            // Продолжаем загрузку других модулей
+            // Игнорируем ошибки загрузки JS модуля
         }
     }
 
@@ -108,54 +79,36 @@ class BudgetApp {
         try {
             const response = await fetch(`./modules/${moduleName}/template.html`);
             
-            if (!response.ok) {
-                throw new Error(`Template not found for module: ${moduleName}`);
+            if (response.ok) {
+                const html = await response.text();
+                
+                const moduleContainer = document.createElement('div');
+                moduleContainer.className = `module module--${moduleName}`;
+                moduleContainer.setAttribute('data-module', moduleName);
+                moduleContainer.innerHTML = html;
+                
+                this.appContainer.appendChild(moduleContainer);
             }
-            
-            const html = await response.text();
-            
-            // Создаем контейнер для модуля
-            const moduleContainer = document.createElement('div');
-            moduleContainer.className = `module module--${moduleName}`;
-            moduleContainer.setAttribute('data-module', moduleName);
-            moduleContainer.innerHTML = html;
-            
-            // Добавляем в основное приложение
-            this.appContainer.appendChild(moduleContainer);
-            
-            console.log(`📄 Template loaded for module: ${moduleName}`);
-            
         } catch (error) {
-            console.warn(`⚠️ No template found for module "${moduleName}", skipping...`);
+            // Игнорируем ошибки загрузки шаблонов
         }
     }
 
     async loadModuleStyles(moduleName) {
-        try {
+        return new Promise((resolve) => {
             const link = document.createElement('link');
             link.rel = 'stylesheet';
             link.href = `./modules/${moduleName}/styles.css`;
             link.setAttribute('data-module', moduleName);
             
-            // Ждем загрузки стилей
-            await new Promise((resolve, reject) => {
-                link.onload = resolve;
-                link.onerror = () => {
-                    console.warn(`⚠️ No styles found for module "${moduleName}"`);
-                    resolve(); // Не прерываем загрузку если стилей нет
-                };
-                document.head.appendChild(link);
-            });
+            link.onload = resolve;
+            link.onerror = resolve;
             
-            console.log(`🎨 Styles loaded for module: ${moduleName}`);
-            
-        } catch (error) {
-            console.warn(`⚠️ Error loading styles for module "${moduleName}":`, error);
-        }
+            document.head.appendChild(link);
+        });
     }
 
     setupNavigation() {
-        // Слушаем события переключения вкладок
         this.on('tab:changed', (data) => {
             if (data && data.tab) {
                 this.switchTab(data.tab);
@@ -166,25 +119,21 @@ class BudgetApp {
     switchTab(tabName) {
         if (this.currentTab === tabName) return;
         
-        // Скрываем все вкладки
         document.querySelectorAll('.tab-content').forEach(tab => {
             tab.classList.remove('active');
         });
         
-        // Показываем выбранную вкладку
         const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
         }
         
         this.currentTab = tabName;
-        console.log(`📱 Switched to tab: ${tabName}`);
     }
 
     showTab(tabName) {
         this.currentTab = tabName;
         
-        // Показываем соответствующую вкладку
         const targetTab = document.querySelector(`.tab-content[data-tab="${tabName}"]`);
         if (targetTab) {
             targetTab.classList.add('active');
@@ -217,33 +166,39 @@ class BudgetApp {
     }
 
     setupModuleInteractions() {
-        // Здесь будут настройки взаимодействия между модулями
-        console.log('🔗 Setting up module interactions...');
+        // Настройки взаимодействия между модулями
     }
 
-    // API для модулей
     getModule(name) {
         return this.modules[name];
     }
 
     emit(eventName, data) {
-        window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+        try {
+            window.dispatchEvent(new CustomEvent(eventName, { detail: data }));
+        } catch (error) {
+            console.error('Error emitting event:', error);
+        }
     }
 
     on(eventName, callback) {
-        window.addEventListener(eventName, (e) => callback(e.detail));
+        try {
+            window.addEventListener(eventName, (e) => callback(e.detail));
+        } catch (error) {
+            console.error('Error adding event listener:', error);
+        }
     }
 }
 
-// Создаем и инициализируем приложение
 const app = new BudgetApp();
 
-// Инициализируем приложение при загрузке DOM
 document.addEventListener('DOMContentLoaded', () => {
-    app.init().catch(console.error);
-    
-    // Экспортируем приложение в глобальную область для отладки
-    window.budgetApp = app;
+    app.init().catch(error => {
+        console.error('Critical app error:', error);
+        app.showError('Критическая ошибка приложения');
+    });
 });
+
+window.budgetApp = app;
 
 export default app;

@@ -5,7 +5,6 @@ export class SettingsModule {
     }
 
     async init() {
-        console.log('🔧 Initializing Settings Module');
         return this;
     }
 }

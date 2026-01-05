@@ -5,7 +5,6 @@ export class OperationsModule {
     }
 
     async init() {
-        console.log('🔧 Initializing Operations Module');
         return this;
     }
 }

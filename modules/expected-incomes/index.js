@@ -5,7 +5,6 @@ export class ExpectedIncomesModule {
     }
 
     async init() {
-        console.log('🔧 Initializing Expected Incomes Module');
         return this;
     }
 }

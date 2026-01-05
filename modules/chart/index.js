@@ -5,7 +5,6 @@ export class ChartModule {
     }
 
     async init() {
-        console.log('🔧 Initializing Chart Module');
         return this;
     }
 }

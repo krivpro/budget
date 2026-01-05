@@ -6,6 +6,10 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    
+    <!-- Favicon заглушка -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>💰</text></svg>">
+    
     <title>Budget App - Планирование бюджета</title>
     
     <!-- Базовые стили -->
@@ -29,21 +33,5 @@
 
     <!-- Главный скрипт приложения -->
     <script type="module" src="app.js"></script>
-
-    <!-- Тестовые данные (удалить в продакшене) -->
-<script>
-    // Проверяем, есть ли уже данные
-    const hasData = localStorage.getItem('budgetOperations') || 
-                    localStorage.getItem('budgetExpectedIncomes') || 
-                    localStorage.getItem('budgetPlannedExpenses');
-    
-    if (!hasData) {
-        // Загружаем тестовые данные
-        const script = document.createElement('script');
-        script.src = 'test-data.js';
-        document.body.appendChild(script);
-    }
-</script>
-
 </body>
 </html>

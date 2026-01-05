@@ -5,11 +5,6 @@ export class CalendarModule {
     }
 
     async init() {
-        console.log('📅 Initializing Calendar Module');
-        
-        // Календарь изначально скрыт (через CSS)
-        // Функционал будет добавлен позже
-        
         return this;
     }
 }

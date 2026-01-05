@@ -1,11 +1,10 @@
-// Модуль плановых расходов
+// Модуль планов - заглушка
 export class PlansModule {
     constructor(app) {
         this.app = app;
     }
 
     async init() {
-        console.log('🔧 Initializing Plans Module');
         return this;
     }
 }
